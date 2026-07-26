@@ -21,80 +21,77 @@ Manager
 
 Manager können:
 
-sich einloggen und ausloggen
-Bücher hinzufügen und löschen
-Exemplare hinzufügen und löschen
-Standorte hinzufügen
-Mitarbeiter hinzufügen, ansehen und löschen
-Mitglieder ansehen
-die Ausleihhistorie von Mitgliedern ansehen
-alle Exemplare ansehen
-Inventuren durchführen
+sich einloggen und ausloggen,
+Bücher hinzufügen und löschen,
+Exemplare hinzufügen und löschen,
+Standorte hinzufügen,
+Mitarbeiter hinzufügen, ansehen und löschen,
+Mitglieder ansehen,
+die Ausleihhistorie von Mitgliedern ansehen,
+alle Exemplare ansehen,
+Inventuren durchführen,
 Statistiken ansehen
 
 
 Mitarbeiter können:
 
-sich einloggen und ausloggen
-Exemplare hinzufügen und löschen
-Mitglieder ansehen
-die Ausleihhistorie von Mitgliedern ansehen
-alle Exemplare ansehen
-Benachrichtigungen einsehen
-Ausleihen am eigenen Standort durchführen
-Rückgaben am eigenen Standort durchführen
+sich einloggen und ausloggen,
+Exemplare hinzufügen und löschen,
+Mitglieder ansehen,
+die Ausleihhistorie von Mitgliedern ansehen,
+alle Exemplare ansehen,
+Benachrichtigungen einsehen,
+Ausleihen am eigenen Standort durchführen,
+Rückgaben am eigenen Standort durchführen,
 Mitglieder History Ansehen
 
 Mitglieder können:
 
-sich registrieren
-sich einloggen und ausloggen
-Bücher ansehen
-Exemplare reservieren
-Exemplare in einem Warenkorb speichern
-aktuelle Ausleihen ansehen
-die eigene Ausleihhistorie ansehen
-Rückgabeanfragen stellen
+sich registrieren,
+sich einloggen und ausloggen,
+Bücher ansehen,
+Exemplare reservieren,
+Exemplare in einem Warenkorb speichern,
+aktuelle Ausleihen ansehen,
+die eigene Ausleihhistorie ansehen,
+Rückgabeanfragen stellen,
 Quittungen als PDF mit QR-Code herunterladen
-
 
 Verwendete Technologien
 Backend
 
-Java
-Jakarta Servlets
-Apache Tomcat
-JDBC
-JNDI
-Gson
-MariaDB
-Redis
-HttpSession
-PBKDF2WithHmacSHA512
+Java,
+Jakarta Servlets,
+Apache Tomcat,
+JDBC,
+JNDI,
+Gson,
+MariaDB,
+Redis,
+HttpSession,
+PBKDF2WithHmacSHA512,
 SecureRandom
 
 
 Frontend
 
 
-HTML
-CSS
-JavaScript
-AJAX
+HTML,
+CSS,
+JavaScript,
+AJAX,
 JSON
 
 
 Deployment und Infrastruktur
 
 
-Docker
-Apache Tomcat
-HAProxy
-WAR-Deployment
-Shell-Skripte
-SSH
+Docker,
+Apache Tomcat,
+HAProxy,
+WAR-Deployment,
+Shell-Skripte,
 Tomcat Manager
-
 
 
 
