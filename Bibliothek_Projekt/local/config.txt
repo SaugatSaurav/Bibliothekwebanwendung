@@ -1,14 +1,14 @@
 user=sausubedi
 baseurl=https://informatik.hs-bremerhaven.de
 webapp=docker-sausubedi-java
-manager=docker-sausubedi-manager
+manager=
 dbserver=mysql-server
-dbname=sausubedi_db
-dbpassword=JX0dC9sNhaFJPFNEqR5c
+dbname=
+dbpassword=
 dbuser=sausubedi
 redisserver=localhost
-redispassword=JX0dC9sNhaFJPFNEqR5c
+redispassword=
 
 
-mailuser=thorragnarog33@gmail.com
-mailpassword=xlzkouzituxrqzrm
+mailuser=
+mailpassword=
