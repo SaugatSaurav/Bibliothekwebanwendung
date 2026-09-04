@@ -10,9 +10,7 @@ sowie die Durchführung von Reservierungen, Ausleihen und Rückgaben.
 
 Die Anwendung besitzt ein rollenbasiertes Berechtigungssystem für:
 
-Manager
-Mitarbeiter
-Mitglieder
+Manager, Mitarbeiter und Mitglieder
 
 Jede Rolle erhält nur Zugriff auf die für sie vorgesehenen Funktionen.
 
@@ -47,12 +45,12 @@ Mitglieder History Ansehen
 
 Mitglieder können:
 
-sich registrieren,
+sich registrieren und Bestätigung per E-mail bekommen,
 sich einloggen und ausloggen,
 Bücher ansehen,
 Exemplare reservieren,
 Exemplare in einem Warenkorb speichern,
-aktuelle Ausleihen ansehen,
+aktuelle Ausleihen in Webseite ansehen und per E-mail bekommen,
 die eigene Ausleihhistorie ansehen,
 Rückgabeanfragen stellen,
 Quittungen als PDF mit QR-Code herunterladen
