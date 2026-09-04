@@ -1,8 +1,8 @@
 user=sausubedi
 baseurl=https://informatik.hs-bremerhaven.de
-webapp=docker-sausubedi-java
+webapp=
 manager=
-dbserver=mysql-server
+dbserver=
 dbname=
 dbpassword=
 dbuser=sausubedi
