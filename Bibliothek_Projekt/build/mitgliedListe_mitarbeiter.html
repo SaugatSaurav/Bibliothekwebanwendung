@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+
+<script>
+
+function mitgliederLaden(){
+ 
+
+let request=new XMLHttpRequest();
+
+request.onreadystatechange= function(){
+ if(request.readyState==4){
+   if(request.status==200){
+
+   let inhalt=JSON.parse(request.responseText);
+   let body=document.getElementById("tbody");
+    body.innerHTML = "";
+
+    for(let i=0;i<inhalt.length;i++){
+   
+     body.innerHTML+= "<tr>"
+        +"<td>"+inhalt[i].id +"</td>"
+        +"<td>"+inhalt[i].vorname+"</td>"
+        +"<td>"+inhalt[i].nachname+"</td>"
+        +"<td>"+inhalt[i].adresse+"</td>"
+        +"<td>"+inhalt[i].email+"</td>"
+        +"<td>"+inhalt[i].datum+"</td>"
+        +"<td>"+inhalt[i].stat+"</td>"
+        + "</tr>";
+     }
+   } else if(request.status == 401) {
+       alert("Sie sind nicht eingeloggt.");
+   
+   }else{
+    alert("Fehler beim Laden von Mitglied Liste");
+    }
+  }
+ }
+  request.open("GET","mitgliedliste",true);
+  request.send();
+}
+
+ window.onload=mitgliederLaden;
+</script>
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="mitarbeiter.html">Home</a>
+        <a href="mitarbeiter_benachrichtigung.html">Benachrichtigung</a>    
+        <a href="exemplarAnsehen_mitarbeiter.html">Alle Exemplare</a>
+        <a id="yes" href="#">Mitglieder Liste</a>   
+        <a href="mitarbeiterHistory.html">Mitglieder History</a>
+
+  
+  <form action="logout" method="POST">
+    <button type="submit">Logout</button>
+  </form>
+    </div>
+
+    <div class="content">
+
+        <div class="header">
+        
+            <h1>Mitglied Liste</h1>
+         
+<br>
+<br>
+     <br>
+   <div class="table-container">
+   <table>
+     <thead>
+       <tr>
+       <th>Id</th>
+       <th>Vorname</th>
+       <th>Nachname</th>
+       <th>Adresse</th>
+       <th>Email</th>
+       <th>Registriert am</th>
+       <th>Status</th>
+       </tr>
+     </thead>
+
+     <tbody id="tbody">
+     
+        </tbody>
+      </table>
+     </div>
+    </div>
+   </main>
+  </div>
+ </div>
+</body>
+</html>

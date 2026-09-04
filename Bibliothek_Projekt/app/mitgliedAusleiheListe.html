@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+<script>
+
+  //Lade ausgeliehene Exemplar Von bestimmte Mitglieder
+
+ function ladeExemplar() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+      if(request.readyState == 4){
+        if(request.status == 200) {
+
+            let daten =JSON.parse(request.responseText);
+            let liste =document.getElementById("buchliste");        
+
+            liste.innerHTML = "";
+              
+              if(daten.length == 0) {
+               liste.innerHTML ="<h3>Keine ausgeliehenen Exemplare vorhanden.</h3>";
+               return;
+              }
+
+                let html = "";
+
+                let aktuelleGruppe = "";
+
+                for(let i = 0; i < daten.length; i++) {
+
+                    /*
+                     * Gleiche Gruppe:
+                     * gleiches Ausleihdatum + gleiches Rückgabedatum.
+                     */
+                    let gruppe = daten[i].reserviert_am + "_" + daten[i].zurueckgeben;
+
+
+                    /*alte Gruppe schließen und neue graue Div öffnen.*/
+                    if(aktuelleGruppe != gruppe) {
+
+                        if(aktuelleGruppe != "") {
+
+                            html += "</div>";
+                            html += "</div>";
+                            html += "<hr>";
+                        }
+
+                        aktuelleGruppe = gruppe;
+
+                        html +=
+                            "<div class='ausleih-gruppe'>"
+                            + "<div class='ausleih-gruppe-kopf'>"
+                            + "<h3>Ausleihedatum: "+ daten[i].reserviert_am + "</h3>"
+                            + "<h3>Rückgabedatum: " + daten[i].zurueckgeben + "</h3>"
+
+                            + "<button type='button' class='pdf-btn' "
+                            + "onclick=\"pdfHerunterladen('"+ daten[i].reserviert_am + "', '" + daten[i].zurueckgeben + "')\">"
+                            + "PDF herunterladen"
+                            + "</button>"
+
+                            + "</div>"
+                            + "<div class='exemplar-liste'>";
+                    }
+
+                         let Fehltage = "";
+
+                         if (daten[i].stat == "AUSGELIEHEN" ||  daten[i].stat == "RUECKGABE_ANGEFRAGT") {
+                           if ( daten[i].fehlTage >= 14) {
+
+                            Fehltage ="<p>Fehltage: " + daten[i].fehlTage
+                             + "<span style='color:red;font-weight:bold'>" + " (Überfällig)" + "</span>" + "</p>";
+
+                         } else {
+                            Fehltage ="<p>Fehltage: " + daten[i].fehlTage + "</p>";
+                            }
+                          }
+
+
+                let rueckgabeButton = "";
+
+                if (daten[i].stat == "RUECKGABE_ANGEFRAGT") {
+                  rueckgabeButton = "<button type='button' class='rueckgabeBtn' disabled "
+                  + "style='background-color:orange;cursor:not-allowed'>" + "Rückgabe angefragt"  + "</button>";
+
+                } else {
+
+                 rueckgabeButton = "<button type='button' class='rueckgabeBtn' "
+                 + "id='btn-" + daten[i].reservierungId + "' "
+                 + "onclick='rueckgabe(" + daten[i].reservierungId + ")'>" + "Rückgabe Anfragen" + "</button>";
+                }
+
+                     html +=
+
+                "<div class='buchkarte' data-standort='" + daten[i].standort.toLowerCase() + "'>"
+                +"<div class='buchIcon'>📘</div>"
+                + "<div class='buchInfo'>"
+
+                +"<h3>Exemplar ID: "+ daten[i].id+ "</h3>" 
+                +"<h3>Titel: "+ daten[i].titel+ "</h3>"
+                + "<p>Autor: "+ daten[i].autor+ "</p>"
+                + "<p>Barcode: "+ daten[i].barcode+ "</p>"
+                + "<p>Standort: "+ daten[i].standort + "</p>"
+                + "<p>Regal: "+ daten[i].regal+ "</p>"
+                + "<p>Genre: "+ daten[i].genre+ "</p>"
+                + "<p>Zustand: " + daten[i].zustand + "</p>"
+                + "<p>Gebühr: " + Number(daten[i].gebuehr).toFixed(2) + " €</p>"
+                +Fehltage
+                + "<p>Status: "+ (daten[i].stat == "RUECKGABE_ANGEFRAGT"
+                    ? "<span style='color:orange;font-weight:bold'>Rückgabe angefragt</span>"
+                    : "<span style='color:red;font-weight:bold'>Ausgeliehen</span>") + "</p>"                
+                + "</div>"
+                +"<div class='buchAktionen'>"
+                + rueckgabeButton
+                + "</div>"
+                + "</div>"
+             }
+
+              if(aktuelleGruppe != "") {
+                    html += "</div>";
+                    html += "</div>";
+                }
+
+                liste.innerHTML = html;
+    
+            } else if(request.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+
+            } else{
+              alert("Fehler beim Laden des reservierte Exemplars");
+
+            }
+        }
+    };
+
+    request.open("GET", "mitgliedAusleiheAnsehen", true);
+    request.send();
+}
+
+
+   //Zurückgeben von ausgeliehenen Exemplar
+
+function rueckgabe(reservierungId) {
+    if (!confirm("Möchten Sie dieses Exemplar wirklich zurückgeben?")) {
+        return;
+    }
+     let request = new XMLHttpRequest();
+    
+       request.onreadystatechange = function() {
+        if(request.readyState == 4) {
+            if(request.status == 200) { 
+              alert("Rückgabe wurde angefragt.");
+                ladeExemplar();
+
+            } else {
+                btn.disabled = false;
+                btn.textContent = "Rückgabe Anfragen";
+                alert("Fehler bei der Rückgabe: " + request.responseText);
+            }
+        }
+    };
+
+    request.open("POST", "exemplarRueckgabe", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.send("reservierungId=" + reservierungId);
+}
+
+
+
+  function pdfHerunterladen(ausgeliehenAm, zurueckgeben) {
+    window.location.href =
+        "mitgliedAusleihePdf?ausgeliehenAm="
+        + encodeURIComponent(ausgeliehenAm)
+        + "&zurueckgeben="
+        + encodeURIComponent(zurueckgeben);
+  }
+
+ window.onload=function(){
+ ladeExemplar();
+ }
+
+
+</script>
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="mitglied.html">Home</a>
+        <a href="mitgliedReservierung.html">Reservierten</a>
+        <a href="mitgliedWarenkorb.html">Warenkorb</a>
+        <a id="yes" href="#">Ausleihe Ansehen </a>
+        <a href="mitgliedHistory.html">Historie</a>  
+           
+   <form action="logout" method="POST">
+     <button type="submit">Logout</button>
+   </form>
+
+    </div>
+
+    <div class="content">
+
+      <div class="page-header">
+       <h1>Ausgeliehene Exemplar</h1>
+
+        </div>
+
+
+<div id="buchliste">
+
+       </div>
+    
+    </div>
+
+</div>
+
+
+
+</body>
+
+</html>

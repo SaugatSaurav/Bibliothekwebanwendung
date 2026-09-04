@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bibliothekssystem</title>
+
+    <link rel="stylesheet" href="index.css">
+
+    <script>
+        function register() {
+           
+            let Vorname = document.getElementById("vname").value.trim();
+            let Nachname = document.getElementById("nname").value.trim();
+            let Adresse = document.getElementById("add").value.trim();
+            let Email = document.getElementById("email").value.trim();
+            let Password = document.getElementById("password").value;
+            let Password2 = document.getElementById("password2").value;
+
+            const errorContainer = document.getElementById("error-container");
+            errorContainer.textContent = "";
+
+
+            if (!Vorname || !Nachname || !Adresse || !Email || !Password ||!Password2) {
+                alert("Bitte füllen Sie alle Felder aus!");
+                return;
+            }
+
+            if (Password !== Password2) {
+                errorContainer.textContent =
+                  "Beide Passwörter müssen übereinstimmen.";
+                  return;
+            }
+
+            const emailRegex = 
+              /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            const passwordRegex =
+              /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
+
+            if (!emailRegex.test(Email)) {
+                errorContainer.textContent = "Ungültige E-Mail-Adresse!";
+                return;
+            }
+
+            if (!passwordRegex.test(Password)) {
+                errorContainer.textContent = "Das Passwort muss 8–15 Zeichen, mindestens eine Zahl, einen Großbuchstaben und einen Kleinbuchstaben enthalten.";
+                return;
+           }
+
+            let request = new XMLHttpRequest();
+
+            request.onreadystatechange = function () {
+              if (request.readyState === 4) {
+
+                    if (request.status === 200) {
+                        document.getElementById("form").innerHTML = request.responseText;
+                        errorContainer.textContent = "";
+
+                    }else if (request.status === 409) {
+                        document.getElementById("error-container").innerText = request.responseText;
+           
+                    }else {
+                        errorContainer.textContent =
+                            "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.";
+                    }
+                }
+            };
+
+            
+
+            request.open("POST","registration",true);
+            request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+            request.send("vname=" + Vorname + "&nname=" + Nachname + "&add=" + Adresse +
+                "&email=" + Email + "&password=" +Password);
+           }
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="index.html">Home</a>
+        <a href="verwaltung.html">Management</a>
+        <a id="yes" href="mitglied_login.html">Mitglied</a>
+    </div>
+
+
+    <div class="content">
+        <div class="header">
+            <h1>Bibliothek Webanwendung</h1>
+        </div>
+        
+
+        <main class="main-content">
+          <div class="formular register-formular">
+
+              
+
+   <form id="form">
+    <h1>Registrieren</h1>
+
+        <label for="vname">Vorname:</label>
+        <input type="text" id="vname" name="vname"  required><br>
+        <label for="nname">Nachname:</label>
+        <input type="text" id="nname" name="nname"  required><br>
+        <label for="add">Addresse:</label>
+        <input type="text" id="add" name="add"  required><br>
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required placeholder="_@_._"><br>
+        <label for="password">Passwort :</label>
+        <input type="password" id="password" name="password" required placeholder="8-15 Zeichen: mind. 1 Groß Buch, 1 klein Buch ,1 Zahl"><br>
+        <label for="password2">Passwort wiederholen :</label>
+        <input type="password" id="password2" name="password2" required><br>
+        <button onclick="register()" type="button">Registrieren</button>
+        <hr>
+    </form>
+
+        <p id="error-container" class="error-container"></p>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+
+   <script>
+        function addmitarbeiter() {
+
+
+          let Vorname = document.getElementById("vname").value.trim();
+          let Nachname = document.getElementById("nname").value.trim();
+          let Standort=document.getElementById("ort").value.trim();  
+          let Adresse = document.getElementById("add").value.trim();
+          let Email = document.getElementById("email").value.trim();
+          let Password = document.getElementById("password").value.trim();
+          let Rolle=document.getElementById("rolle").value.trim();
+            
+          const errorContainer =document.getElementById("error-container");
+          errorContainer.textContent = "";
+
+
+            if (!Vorname || !Nachname || !Adresse || !Email || !Password ||!Standort || !Rolle) {
+                alert("Bitte füllen Sie alle Felder aus!");
+                return;
+            }
+          
+
+            const emailRegex =
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            const passwordRegex =
+                /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
+
+            if (!emailRegex.test(Email)) {
+              errorContainer.textContent = "Ungültige E-Mail-Adresse!";
+                return;
+            }
+
+            if (!passwordRegex.test(Password)) {
+                errorContainer.textContent =
+                "Das Passwort muss 8–15 Zeichen, mindestens eine Zahl, einen Großbuchstaben und einen Kleinbuchstaben enthalten.";
+                return;
+            }
+
+
+  
+
+            let request = new XMLHttpRequest();
+
+            request.onreadystatechange = function () {
+                if (request.readyState === 4) {
+
+                    if (request.status === 200) {
+                        document.getElementById("hi").innerHTML = request.responseText;
+
+
+                   }else if(request.status === 409) {
+                        document.getElementById("error-container").innerText = request.responseText;
+
+                    }else {
+                        errorContainer.textContent =  "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.";
+                    }
+                }
+            };
+
+            request.open("POST","addmitarbeiter",true);
+            request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+            request.send("vname=" + Vorname + "&nname=" + Nachname +"&add=" + Adresse +
+                "&email=" + Email + "&password=" +Password + "&rolle=" + Rolle + "&standort_id="+ Standort);
+           }
+
+
+   function ladeStandorte() {
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                let standorte = JSON.parse(request.responseText);
+
+                let select = document.getElementById("ort");
+               
+                select.innerHTML = "<option value=''>Standort wählen</option>";
+
+                for (let i = 0; i < standorte.length; i++) {
+                    select.innerHTML +=
+                        "<option value='" + standorte[i].id + "'>" +
+                        standorte[i].name + ", " +
+                        standorte[i].strasse + ", " +
+                        standorte[i].plz + " " +
+                        standorte[i].ort +
+                        "</option>";
+                }
+            }else{
+              alert("Fehler Beim Laden von Standort");
+            }
+        }
+    }
+
+    request.open("GET", "standortliste", true);
+    request.send();
+}
+
+window.onload=ladeStandorte;
+
+</script>
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a  href="manager.html">Home</a>
+        <a href="standort.html">Standort Hinzufügen</a> 
+        <a href="exemplarAnsehen.html">Alle Exemplare</a>
+        <a href="mitarbeiterliste.html">Mitarbeiter Liste</a>
+        <a id="yes" href="#">Mitarbeiter Hinzufügen</a>
+        <a href="mitgliedListe.html">Mitglieder Liste</a>
+        <a href="managerHistory.html">Mitglieder History</a>
+        <a href="inventur.html">Inventur</a>
+        <a href="statistik.html">Statistik</a>
+
+   <form action="logout" method="POST">
+     <button type="submit">Logout</button>
+   </form>
+
+    </div>
+
+    <div class="content">
+
+        <div class="header">
+
+            <h1>
+                Manager Seite
+            </h1>
+
+        </div>
+         <main class="main-content">
+
+        <div class="formular mitarbeiter-formular" id="hi">
+
+    <h1>Mitarbeiter Hinzufügen</h1>
+
+
+    <form>
+        <label for="vname">Vorname:</label>
+        <input type="text" id="vname" name="vname"  required><br>
+        <label for="nname">Nachname:</label>
+        <input type="text" id="nname" name="nname"  required><br>
+        <label for="add">Addresse:</label>
+        <input type="text" id="add" name="add"  required><br>
+
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required placeholder="_@_._"><br>
+        <label for="password">Passwort :</label>
+        <input type="password" id="password" name="password" required placeholder="8-15 Zeichen: mind. 1 Groß Buch, 1 klein Buch ,1 Zahl"><br>
+
+        <label for="rolle">Rolle:</label>
+        <select name="rolle" id="rolle">
+          <option value="Mitarbeiter">Mitarbeiter</option>
+          <option value="Manager">Manager</option>
+        </select>
+        
+        <label for="ort">Standort</label>
+        <select id="ort" name="ort" required>
+          <option value="">Standort wählen</option>
+        </select>
+          
+        <button type="button" onclick="addmitarbeiter()">Hinzufügen</button>
+        <br>
+
+    </form>
+
+    <p id="error-container"></p>
+
+
+    </div>
+  </main>
+</div>
+
+</div>
+
+</body>
+
+</html>

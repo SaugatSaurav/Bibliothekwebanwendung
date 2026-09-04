@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+
+<script>
+
+ 
+
+function mitarbeiterLaden(){
+
+let request=new XMLHttpRequest();
+
+ request.onreadystatechange= function(){
+
+ if(request.readyState==4){
+   if(request.status==200){
+
+   let inhalt=JSON.parse(request.responseText);
+   let body=document.getElementById("tbody");
+    body.innerHTML = "";
+
+    for(let i=0;i<inhalt.length;i++){
+   
+
+     body.innerHTML+="<tr>"
+       +"<td>"+inhalt[i].id +"</td>"
+        +"<td>"+inhalt[i].vorname+"</td>"
+        +"<td>"+inhalt[i].nachname+"</td>"
+        +"<td>"+inhalt[i].adresse+"</td>"
+         +"<td>"+inhalt[i].email+"</td>"
+         +"<td>"+inhalt[i].rolle+"</td>"
+         +"<td>"+inhalt[i].datum+"</td>"
+        +"<td>"+inhalt[i].ort+"</td>"
+   + "<td>"
+    + (inhalt[i].rolle === "Mitarbeiter"
+        ? "<button type='button' onclick=\"loescheMitarbeiter('" + inhalt[i].id + "')\">Löschen</button>"
+        : "")
+    + "</td>"
+    + "</tr>";
+   
+    }
+   }else if(request.status == 401) {
+      alert("Sie sind nicht eingeloggt.");
+   }else{
+      alert("Fehler beim Laden von Mitarbeiter Liste");
+    }
+  }
+ }
+
+request.open("GET","mitarbeiterliste",true);
+request.send();
+  }
+
+
+function loescheMitarbeiter(id) {
+
+    if (!confirm("Möchten Sie diese Mitarbeiter wirklich löschen?")) {
+        return;
+    }
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                alert(request.responseText);
+                mitarbeiterLaden();
+
+            } else {
+                alert("Fehler beim Löschen des Mitarbeiters!");
+            }
+        }
+    }
+
+    request.open("POST", "mitarbeiterloeschen", true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("id=" +id);
+}
+
+
+
+
+ window.onload=mitarbeiterLaden;
+
+
+
+</script>
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="manager.html">Home</a>
+        <a  href="standort.html">Standort Hinzufügen</a> 
+        <a href="exemplarAnsehen.html">Alle Exemplare</a>
+        <a id="yes" href="#">Mitarbeiter Liste</a>
+        <a href="addmitarbeiter.html">Mitarbeiter Hinzufügen</a>
+        <a href="mitgliedListe.html">Mitglieder Liste</a>
+        <a href="managerHistory.html">Mitglieder History</a>
+        <a href="inventur.html">Inventur</a>
+        <a href="statistik.html">Statistik</a>
+
+
+     <form action="logout" method="POST">
+    <button type="submit">Logout</button>
+   </form>
+    </div>
+
+    <div class="content">
+
+        <div class="header">
+        
+            <h1>Manager Dashboard</h1>
+        
+    
+<br>
+<br>
+     <br>
+   <div class="table-container">
+   <table>
+     <thead>
+       <tr>
+       <th>Id</th>
+       <th>Vorname</th>
+       <th>Nachname</th>
+       <th>Adresse</th>
+       <th>Email</th>
+       <th>Rolle</th>
+       <th>Eingestellt</th>
+       <th>Standort</th>
+       <th>Aktion</th>
+       </tr>
+     </thead>
+
+     <tbody id="tbody">
+     
+     </tbody>
+   </table>
+   </div>
+    </div>
+
+
+    </main>
+
+
+        </div>
+   
+        
+
+
+
+
+    </div>
+    
+   
+
+
+
+</body>
+
+</html>

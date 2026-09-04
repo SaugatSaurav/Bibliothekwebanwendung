@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Bibliothekssystem - Mitglieder Historie</title>
+
+    <link rel="stylesheet" href="management.css">
+
+    <script>
+
+        function ladeHistorie() {
+
+            let request = new XMLHttpRequest();
+
+            request.onreadystatechange = function() {
+
+                if (request.readyState == 4) {
+
+                    if (request.status == 200) {
+
+                        let daten = JSON.parse(request.responseText);
+                        let liste =document.getElementById("reservierungsliste");
+
+                        liste.innerHTML = "";
+
+                        if (daten.length == 0) {
+                         liste.innerHTML ="<h3>Keine Historie vorhanden.</h3>";
+                         return;
+                        }
+
+                        let html = "";
+                        let aktuelleMitgliedId = -1;
+                        for (let i = 0; i < daten.length; i++) {
+
+
+
+                            if (aktuelleMitgliedId!= daten[i].mitgliedId) {
+
+                                if (aktuelleMitgliedId != -1) {
+
+                                    html += "</div>";
+
+                                    html += "</div>";
+                                }
+
+                                aktuelleMitgliedId = daten[i].mitgliedId;
+
+                                /*
+                                 * Anzahl der Historieneinträge
+                                 * des aktuellen Mitglieds berechnen.
+                                 */
+                                let anzahlEintraege = daten.filter(function(eintrag) { 
+                                  return eintrag.mitgliedId == aktuelleMitgliedId;
+                                    }).length;
+
+                             
+                             html +=
+                                    "<div style='background-color:#d3d3d3' class='reservierungsgruppe' "
+                                    + " data-mitglied-id='" + daten[i].mitgliedId + "'"
+                                    + " data-mitglied-name='" + daten[i].name.toLowerCase() + "'>"
+
+                      + "<div style='background-color:#d3d3d3;padding:15px;border-radius:10px' class='reservierungsgruppen-kopf'>"
+                   
+                                    + "<div>"
+                                    + "<h2>Mitglied: "+ daten[i].name + "</h2>"
+                                    + "<p>Mitglied-ID: "+ daten[i].mitgliedId + "</p>"
+                                    + "<p>E-Mail: "+ daten[i].email + "</p>"
+                                    + "<p>Adresse: "+ daten[i].addresse + "</p>"
+                             + "<p>Status-Mitglied: <span style='color:" + (daten[i].mitgliedStatus == "AKTIV" ? "green" : "red")
+                             + ";font-weight:bold'>" + daten[i].mitgliedStatus + "</span></p>"
+                                    + "</div>"
+                                    + "<span class='neues-buch-btn'>"+ anzahlEintraege+ " Einträge" + "</span>"
+                                    + "</div>"
+                                    + "<div class='exemplar-liste'>";
+                            }
+
+
+                      let statusAnzeige = {
+                       "AUSGELIEHEN": ["Ausgeliehen", "red"], "RESERVIERT": ["Reserviert", "blue"],
+                       "WARENKORB": ["Warenkorb", "brown"], "ZURUECKGEGEBEN": ["Zurückgegeben", "green"],
+                        "RUECKGABE_ANGEFRAGT": ["Rückgabe Angefragt", "orange"]}[daten[i].status] || [daten[i].status, "black"];
+                               
+                            
+              let datumAnzeige = "";
+
+              if (daten[i].status == "RESERVIERT") {
+                       datumAnzeige = "<p>Reserviert am: " + daten[i].ausgeliehenAm + "</p>";
+
+            }else if (daten[i].status == "AUSGELIEHEN" || daten[i].status == "ZURUECKGEGEBEN" || daten[i].status == "RUECKGABE_ANGEFRAGT") {
+
+                       datumAnzeige = "<p>Ausgeliehen am: " + daten[i].ausgeliehenAm + "</p>"
+                                    + "<p>Rückgabedatum: " + daten[i].zurueckgeben + "</p>";
+                     }
+
+
+                        let gebuehrAnzeige = "";
+                        let gebuehr = Number(daten[i].gebuehr);
+
+                         if (daten[i].status == "AUSGELIEHEN" ||  daten[i].status == "ZURUECKGEGEBEN" || daten[i].status == "RUECKGABE_ANGEFRAGT") {
+                          if(daten[i].status == "ZURUECKGEGEBEN" && gebuehr > 0) {
+
+
+
+                            gebuehrAnzeige =
+                             "<p>Gebühr: " + gebuehr.toFixed(2) + " € "
+                             + "<span style='color:green;font-weight:bold'>" + "(Bezahlt)" + "</span>" + "</p>";
+
+                         } else {
+                            gebuehrAnzeige = "<p>Gebühr: " + gebuehr.toFixed(2) + " €</p>";
+                            }
+                          }
+
+
+
+                        let Fehltage = "";
+
+                         if (daten[i].status == "AUSGELIEHEN" ||  daten[i].status == "RUECKGABE_ANGEFRAGT" || daten[i].status == "ZURUECKGEGEBEN") {
+                           if ( daten[i].fehlTage >= 14) {
+
+                            Fehltage = "<p>Fehltage: " + daten[i].fehlTage
+                             + "<span style='color:red;font-weight:bold'>" + " (Überfällig)" + "</span>" + "</p>";
+                         } else {
+
+                            Fehltage = "<p>Fehltage: " + daten[i].fehlTage + "</p>";
+                            }
+                          }
+
+
+                             html +=
+                                "<div class='buchkarte'>"
+
+                                + "<div class='buchIcon'>📘</div>"
+
+                                + "<div class='buchInfo'>"
+
+                                + "<h3>Exemplar-ID: " + daten[i].exemplarId + "</h3>"
+
+                                + "<h3>Titel: " + daten[i].titel + "</h3>"
+
+                                + "<p>Autor: " + daten[i].autor + "</p>"
+
+                                + "<p>Genre: " + daten[i].genre + "</p>"
+ 
+                                + "<p>Barcode: " + daten[i].barcode + "</p>"
+
+                                + "<p>Standort: " + daten[i].standort + "</p>"
+
+                                + "<p>Regal: " + daten[i].regal + "</p>"
+
+                                + "<p>Zustand: " + daten[i].zustand + "</p>"
+
+                                + datumAnzeige
+                                + gebuehrAnzeige
+                                + Fehltage
+
+                                + "<p>Status: <span style='color:" + statusAnzeige[1] + ";font-weight:bold'>" 
+                                + statusAnzeige[0] + "</span></p>"
+
+                                + "</div>"
+
+                                + "</div>";                        
+                            }
+                        
+                         /*
+                         * Letzte Mitgliedsgruppe schließen.
+                         */
+                        if (aktuelleMitgliedId != -1) {
+
+                            html += "</div>";
+
+                            html += "</div>";
+                        }
+
+                        liste.innerHTML = html;
+
+                    
+                   }else if (request.status == 401) {
+                        alert("Sie sind nicht eingeloggt.");
+
+                    } else {
+                        alert(
+                            "Fehler beim Laden der Historie.");
+                    }
+                }
+            };
+
+            request.open("GET","mitarbeiterHistorie",true);
+            request.send();
+        }
+
+
+
+function sucheHistorie() {
+
+    let suchtext = document.getElementById("searchInput").value.toLowerCase().trim();
+
+    let gruppen =document.getElementsByClassName("reservierungsgruppe");
+
+    for(let i = 0; i < gruppen.length; i++) {
+
+        let mitgliedId = gruppen[i].getAttribute("data-mitglied-id") || "";
+
+        let mitgliedName = gruppen[i].getAttribute("data-mitglied-name") || "";
+
+        if(mitgliedId === suchtext || mitgliedName.includes(suchtext) || suchtext === "") {
+            gruppen[i].style.display = "block";
+        } else {
+            gruppen[i].style.display = "none";
+        }
+    }
+}
+   window.onload=ladeHistorie;
+
+    </script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="mitarbeiter.html">
+            Home
+        </a>
+
+        <a href="mitarbeiter_benachrichtigung.html">
+            Benachrichtigung
+        </a>
+
+        <a href="exemplarAnsehen_mitarbeiter.html">
+            Alle Exemplare
+        </a>
+
+        <a href="mitgliedListe_mitarbeiter.html">
+            Mitglieder Liste
+        </a>
+
+        <a id="yes" href="#">
+            Mitglieder Historie
+        </a>
+
+        <form action="logout" method="POST">
+
+            <button type="submit">
+                Logout
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="content">
+
+        <div class="page-header">
+
+            <h1>Mitglieder Historie</h1>
+
+            <p>
+                Alle Ausleihen und Reservierungen aller Mitglieder
+            </p>
+
+        </div>
+
+
+        <div class="search-box">
+
+            <input type="text" id="searchInput"
+                placeholder="Suchen nach Mitglied Id oder Mitglied Name"
+                onkeyup="sucheHistorie()">
+        </div>
+
+        <div id="reservierungsliste"></div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

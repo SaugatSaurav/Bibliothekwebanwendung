@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet"
+      href="index.css">
+<script>
+
+function login(){
+  
+  let Email=document.getElementById("email").value;
+  let Password=document.getElementById("password").value;
+
+  if(!Email || !Password){
+  alert("Bitte Füllen Sie alle Felder aus");
+    return false;
+  }
+let request=new XMLHttpRequest();
+
+   request.onreadystatechange= function(){
+    if(request.readyState==4){
+      if(request.status==200){
+        let rolle=request.responseText.trim();
+
+        if(rolle === "Mitarbeiter"){
+          window.location.href="mitarbeiter.html";
+        
+        }else if(rolle === "Manager"){
+          window.location.href="manager.html";
+        
+        }
+     }else if(request.status == 401){
+         document.getElementById("error-container").innerText = "Falsche E-Mail oder Passwort!";
+
+     }else{
+         document.getElementById("error-container").innerText = "Etwas Schief gelaufien. Try Again!";
+  }
+ }
+}
+    request.open("POST","managementlogin",true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.send("email="+ Email + "&password="+ Password);
+  }
+
+
+</script>
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="index.html">Home</a>
+        <a id="yes" href="#">Management</a>
+        <a  href="mitglied_login.html">Mitglied</a>
+
+    </div>
+
+    <div class="content">
+
+        <div class="header">
+            <h1> Bibliothek Webanwendung </h1>
+        </div>
+
+     <main class="main-content">
+
+    <div class="formular">
+
+    <h1>Login</h1>
+    <form>
+      <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button onclick="login()" type="button">Login</button>
+        <hr>
+    </form>
+
+       <div id="error-container" class="error-container" style="color:red;
+           font-size: 20px; font-family: Comic Sans MS">
+       </div>
+    </div>
+  </main>
+ </div>
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+<script>
+
+  //Buch Hinzufügen
+ function addBuch(){
+ let request=new XMLHttpRequest();
+
+let Titel=document.getElementById("titel").value;
+let Autor= document.getElementById("autor").value;
+let ISBN = document.getElementById("isbn").value.trim();
+let Jahr=document.getElementById("jahr").value.trim();
+let Genre = document.getElementById("genre").value;
+
+  if(!Titel||!Autor||!ISBN||!Jahr||!Genre){
+   alert("Bitte alle Felder ausfüllen");
+   return;
+  }
+
+ request.onreadystatechange= function(){
+
+ if(request.readyState==4){
+   if(request.status==200){
+   
+
+    document.getElementById("go").innerHTML="<h2>Buch Erfolgreich Hinzugefügt</h2><p>Sie können jetzt hinzugefügte Buch ansehen</p>"
+    document.getElementById("ansehenBtn").style.display = "block";
+    document.getElementById("message").innerText = "";
+    return;
+   }else if (request.status === 409) {
+
+      document.getElementById("message").innerText = request.responseText;
+
+    }else if(request.status == 401) {
+
+                alert("Sie sind nicht eingeloggt.");
+
+    }}else{
+
+     document.getElementById("message").innerText="Fehler beim Hinzufügen";
+    }
+  }
+ 
+ request.open("POST","addbuch",true);
+ request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+request.send("titel="+ Titel + "&autor="+ Autor + "&isbn="+ ISBN + "&jahr="+Jahr+ "&genre="+Genre);
+}
+
+
+
+
+
+
+//Bücher Laden
+
+function ladeBuch() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+
+      if(request.readyState == 4){
+        if(request.status == 200) {
+
+            let daten =JSON.parse(request.responseText);
+
+            let liste =document.getElementById("buchliste");
+
+            liste.innerHTML = "";
+
+          if(daten.length == 0) {
+               liste.innerHTML = "<h3>Kein Buch vorhanden.</h3>";
+                return;
+              }
+
+            for(let i=0;i<daten.length; i++) {
+
+                liste.innerHTML +=
+
+                "<div class='buchkarte'>"
+
+                + "<div class='buchIcon'>📘</div>"
+
+                + "<div class='buchInfo'>"
+
+                + "<h3>"
+                + daten[i].titel
+                + "</h3>"
+
+                + "<p>Autor: "
+                + daten[i].autor
+                + "</p>"
+
+                + "<p>ISBN: "
+                + daten[i].isbn
+                + "</p>"
+
+                + "<p>Erscheinungsjahr: "
+                + daten[i].erscheinungsjahr + "</p>"
+
+                + "<p>Genre: "
+                + daten[i].genre
+                + "</p>"
+ 
+                + "<p>Exemplar Count:  "
+                + daten[i].exemplar_count
+                + "</p>"
+
+
+                + "</div>"
+
+                + "<div class='buchAktionen'>"
+
+               + "<button type='button' onclick=\"openExemplarModal('" + daten[i].id + "')\">"
+               + "Exemplar hinzufügen"
+               + "</button>"
+               
+
+               +"<button onclick=\"location.href='exemplarAnsehen.html?buchid=" + daten[i].id + "'\">"
+               + "Exemplare anzeigen"
+               + "</button>"
+
+                + "<button type='button' class='deleteBtn' "
+                + "onclick=\"loescheBuch('" + daten[i].id + "')\">"
+                + "Löschen"
+                + "</button>"
+
+                + "</div>"
+
+                + "</div>";
+            }
+        }else if(request.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+           
+
+        }else{
+
+              alert("Fehler beim Laden der Bücher");
+
+            }
+
+        }
+    };
+
+    request.open("GET", "buchliste", true);
+
+    request.send();
+}
+
+
+
+function openModal() {
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("bookModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("bookModal").style.display = "none";
+}
+
+
+
+
+
+function loescheBuch(id) {
+
+    if (!confirm("Möchten Sie dieses Buch wirklich löschen?")) {
+        return;
+    }
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+
+        if (request.readyState === 4) {
+
+            if (request.status === 200) {
+                alert(request.responseText);
+
+               
+                ladeBuch();
+
+            
+            } else {
+                alert("Fehler beim Löschen des Buches.");
+            }
+        }
+    }
+
+    request.open("POST", "buchloeschen", true);
+
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+
+    request.send("id=" +id);
+}
+
+
+
+function addExemplar(){
+ let request=new XMLHttpRequest();
+
+
+let BuchId = document.getElementById("BuchId").value;
+let Standort=document.getElementById("ort").value;
+let Regal= document.getElementById("regal").value;
+let Zustand = document.getElementById("zustand").value.trim();
+let Barcode=document.getElementById("barcode").value.trim();
+
+  if(!Standort||!Regal||!Zustand||!Barcode){
+   alert("Bitte alle Felder ausfüllen");
+   return;
+  }
+
+ request.onreadystatechange= function(){
+
+   if(request.readyState==4){
+     if(request.status==200){
+   
+
+     document.getElementById("gone").innerHTML="<h2>Examplar Erfolgreich hinzugefügt</h2>"
+       +"<p>Sie können jetzt hinzugefügte Exemplar ansehen</p>";
+    document.getElementById("ansehenBtns").style.display = "block";
+    document.getElementById("messages").innerText = "";
+    return;
+   }else if (request.status === 409) {
+      document.getElementById("messages").innerText = request.responseText;
+
+    } else{
+     document.getElementById("messages").innerText="Fehler beim Hinzufügen";
+    }
+  }
+ }
+   request.open("POST","addexemplar",true);
+   request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   request.send("buch_id="+ BuchId + "&standort_id="+ Standort + "&regal="+  Regal + "&zustand="+Zustand+ "&barcode="+Barcode);
+}
+
+
+
+
+function openExemplarModal(id) {
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("exemplarModal").style.display = "block";
+
+    document.getElementById("BuchId").value = id;
+    //document.getElementById("exemplar-message").innerText = "";
+
+    ladeStandorte(id);
+ }
+
+function closeExemplarModal() {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("exemplarModal").style.display = "none";
+
+    document.getElementById("exemplarForm").reset();
+}
+
+function ladeStandorte(buchId) {
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                let standorte = JSON.parse(request.responseText);
+
+
+               let select = document.getElementById("ort");
+                select.innerHTML = "<option value=''>Standort wählen</option>";
+
+                for (let i = 0; i < standorte.length; i++) {
+                    select.innerHTML +=
+                        "<option value='" + standorte[i].id + "'>" +
+                        standorte[i].name + ", " +
+                        standorte[i].strasse + ", " +
+                        standorte[i].plz + " " +
+                        standorte[i].ort +
+                        "</option>";
+                }
+            }else{
+              alert("Fehler Beim Laden von Standort");
+            }
+        }
+    }
+
+    request.open("GET", "standortliste?buchid=" + buchId, true);
+    request.send();
+}
+
+function sucheExemplar() {
+
+    let suchtext = document.getElementById("searchInput").value.toLowerCase();
+    let karten = document.getElementsByClassName("buchkarte");
+
+    for (let i = 0; i < karten.length; i++) {
+
+        let text = karten[i].innerText.toLowerCase();
+        if (text.includes(suchtext)) {
+            karten[i].style.display = "flex";
+        } else {
+            karten[i].style.display = "none";
+        }
+    }
+}
+
+//Profil
+
+
+function zeigeProfil() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange =function() {
+        if(request.readyState == 4 && request.status == 200) {
+
+            let daten =JSON.parse(request.responseText);
+
+            document.getElementById("profilId").innerText = daten.id;
+
+            document.getElementById("profilVorname").innerText = daten.vorname;
+
+            document.getElementById("profilNachname").innerText = daten.nachname;
+
+            document.getElementById("profilEmail").innerText = daten.email;
+
+            document.getElementById("profilRolle").innerText = daten.rolle;
+
+            document.getElementById("profilStandort").innerText = daten.standort;
+
+            document.getElementById("profilAdresse").innerText = daten.addresse;
+
+            document.getElementById("overlay").style.display ="block";
+
+            document.getElementById("profilModal").style.display ="block";
+        }
+    };
+
+    request.open("GET","profil",true);
+    request.send();
+}
+
+function closeProfilModal() {
+
+    document.getElementById("overlay").style.display = "none";
+
+    document.getElementById("profilModal").style.display = "none";
+}
+
+window.onload=function(){
+  ladeBuch();
+}
+
+</script>
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+      <a id="yes" href="#">Home</a>
+      <a href="#" onclick="zeigeProfil()">Profil</a>
+      <a href="standort.html">Standort Hinzufügen</a> 
+      <a href="exemplarAnsehen.html">Alle Exemplare</a>
+      <a href="mitarbeiterliste.html">Mitarbeiter Liste</a>
+      <a href="addmitarbeiter.html">Mitarbeiter Hinzufügen</a>
+      <a href="mitgliedListe.html">Mitglieder Liste</a>
+      <a href="managerHistory.html">Mitglieder History</a>
+      <a href="inventur.html">Inventur</a>
+      <a href="statistik.html">Statistik</a>
+
+     <form action="logout" method="POST">
+    <button type="submit">Logout</button>
+   </form>
+
+    </div>
+
+    <div class="content">
+
+        <div class="page-header">
+        
+            <h1>Manager Dashboard</h1>
+        
+    
+       <button class="neues-buch-btn" onclick="openModal()">
+        <span>+</span> Neues Buch
+    </button>
+</div>
+
+<div class="search-box">
+    <span>⌕</span>
+ 
+<input type="text"
+       id="searchInput"
+       placeholder="Titel, Autor, ISBN, Standort oder Genre..."
+       onkeyup="sucheExemplar()">
+  </div>
+
+<div id="buchliste">
+
+</div>
+
+
+
+    <div id="overlay" class="overlay"></div> 
+    
+
+
+
+    <div id="bookModal" class="modal">
+    <div id="go">
+     
+    <h2>Neues Buch hinzufügen</h2>
+
+
+   <form id="bookForm">
+
+    <label for="titel">Titel</label>
+    <input type="text" id="titel" name="titel" required>
+
+    <label for="autor">Autor</label>
+    <input type="text" id="autor" name="autor" required>
+
+    <label for="isbn">ISBN</label>
+    <input type="number" id="isbn" name="isbn" required>
+
+    <label for="jahr">Erscheinungsjahr</label>
+    <input type="date" id="jahr" name="jahr" required>
+
+    <label for="genre">Genre</label>
+    <select id="genre" name="genre">
+        <option value="">Wählen</option>
+        <option value="Sachbuch">Sachbuch</option>
+        <option value="Krimi">Krimi</option>
+        <option value="Jugendbuch">Jugendbuch</option>
+    </select>
+       
+    <button onclick="addBuch()" type="button">Hinzufügen</button>
+   <button type="button" class="cancel-btn" onclick="closeModal()">Schließen</button>
+
+ 
+
+</form>
+  
+    </div>
+      <p id="message"></p>
+    
+  
+    <button id="ansehenBtn" type="button" style="display:none" onclick="window.location.href='manager.html'">Schließen
+    </button>
+
+</div>
+
+<div id="exemplarModal" class="modal">
+     <div id="gone">
+    <h2>Exemplar hinzufügen</h2>
+
+    <form id="exemplarForm">
+
+        <input type="hidden" id="BuchId">
+
+        <label for="barcode">Barcode</label>
+        <input type="text" id="barcode" name="barcode" required>
+
+        <label for="ort">Standort</label>
+        <select id="ort" name="ort" required>
+            <option value="">Standort wählen</option>
+        </select>
+
+        <label for="regal">Regal</label>
+        <input type="text" id="regal" name="regal" required>
+
+        <label for="zustand">Zustand</label>
+        <select id="zustand" name="zustand" required>
+            <option value="">Zustand wählen</option>
+            <option value="NEU">NEU</option>
+        </select>
+
+        <button type="button" onclick="addExemplar()">
+            Hinzufügen
+        </button>
+
+        <button type="button" class="cancel-btn" onclick="closeExemplarModal()">
+            Schließen
+        </button>
+
+    </form>
+</div>
+    <p id="messages"></p>
+  
+ <button id="ansehenBtns" type="button" style="display:none" onclick="window.location.href='manager.html'">Schließen
+    </button>
+
+
+
+</div>
+
+    
+    </div>
+
+</div>
+
+<div id="profilModal"
+     class="modal">
+
+    <h2>
+        Manager Profil
+    </h2>
+
+    <p>
+        <b>ID:</b>
+        <span id="profilId"></span>
+    </p>
+
+    <p>
+        <b>Vorname:</b>
+        <span id="profilVorname"></span>
+    </p>
+
+    <p>
+        <b>Nachname:</b>
+        <span id="profilNachname"></span>
+    </p>
+
+    <p>
+        <b>Email:</b>
+        <span id="profilEmail"></span>
+    </p>
+
+    <p>
+        <b>Rolle:</b>
+        <span id="profilRolle"></span>
+    </p>
+
+    <p>
+        <b>Standort:</b>
+        <span id="profilStandort"></span>
+    </p>
+
+    <p>
+        <b>Adresse:</b>
+        <span id="profilAdresse"></span>
+    </p>
+
+    <button
+        type="button"
+        onclick="closeProfilModal()">
+
+        Schließen
+
+    </button>
+
+</div>
+
+</body>
+
+</html>

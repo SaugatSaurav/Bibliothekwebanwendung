@@ -1,0 +1,284 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background-color: #f4f6f9;
+}
+
+/* Gesamter Seitenbereich */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Linke Navigation */
+.sidebar {
+    flex: 0 0 320px;
+    width: 320px;
+    min-height: 100vh;
+    background-color: #1e293b;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    color: white;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.sidebar a:hover {
+    background-color: #334155;
+}
+
+/* Aktuell ausgewählte Seite */
+.sidebar #yes {
+    background-color: #87cefa;
+}
+
+/* Rechter weißer Bereich */
+.content {
+    flex: 1;
+    min-width: 0;
+    min-height: 100vh;
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* Überschrift oben */
+.header {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+      text-align: center;
+
+}
+
+.header h1 {
+    color: #007bff;
+    font-size: 36px;
+    font-weight: bold;
+      text-align: center;
+
+}
+
+/* Bereich für Login oder Registrierung */
+.main-content {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px 30px 30px;
+}
+
+/* Allgemeine Formularbox */
+.formular {
+    width: 100%;
+    max-width: 450px;
+    padding: 28px;
+    border-radius: 10px;
+    background-color: rgba(240, 248, 255, 0.95);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
+    text-align: center;
+}
+
+.formular h1 {
+    color: #007bff;
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.formular label {
+    display: block;
+    margin: 10px 0;
+    color: #0e395e;
+    font-size: 17px;
+}
+
+/* Eingabefelder */
+.formular input {
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Button */
+.formular button {
+    width: 100%;
+    padding: 12px;
+    background-color: #0ba1ec;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+
+    transition:
+        background-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.formular button:hover {
+    background-color: #45a049;
+    transform: scale(1.02);
+}
+
+/* Text unter dem Login */
+.formular p {
+    margin: 20px 0 0;
+    line-height: 1.6;
+}
+
+/* Link innerhalb des Formulars */
+.formular a {
+    margin-left: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.formular a:hover {
+    color: #45a049;
+}
+
+/* Fehlermeldung */
+.error-container {
+    color: red;
+    font-size: 15px;
+    font-family: "Comic Sans MS", sans-serif;
+}
+
+/* Registrierung kompakter machen */
+.register-formular {
+    max-width: 480px;
+    padding: 20px 28px;
+
+    /* Registrierung unterhalb der Hauptüberschrift */
+    align-self: flex-start;
+    margin-top: 5px;
+
+    /* Keine Scrollleiste innerhalb der Box */
+    max-height: none;
+    overflow: visible;
+}
+
+.register-formular h1 {
+    margin-bottom: 12px;
+}
+
+.register-formular label {
+    margin: 5px 0;
+}
+
+.register-formular input {
+    padding: 9px;
+    margin-bottom: 8px;
+}
+
+.register-formular button {
+    padding: 10px;
+    margin-top: 2px;
+}
+
+.register-formular .error-container {
+    margin-top: 8px;
+}
+
+
+
+
+
+
+.registration-success {
+    text-align: center;
+    padding: 25px 10px;
+}
+
+.registration-success h2 {
+    color: #28a745;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.registration-success h3 {
+    color: #0e395e;
+    font-size: 19px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.registration-success p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Anpassung für kleinere Bildschirme */
+@media screen and (max-width: 900px) {
+    .sidebar {
+        flex-basis: 250px;
+        width: 250px;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 30px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+}

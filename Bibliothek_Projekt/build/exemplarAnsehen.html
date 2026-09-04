@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+<script>
+
+
+ function ladeExemplar() {
+    
+    const params = new URLSearchParams(window.location.search);
+
+    let buchid = params.get("buchid");  
+   
+    let url = "exemplarliste";
+
+          if (buchid) {
+            url += "?buchid=" + buchid; }
+
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+
+      if(request.readyState == 4){
+        if(request.status == 200) {
+
+            let daten =JSON.parse(request.responseText);
+
+            let liste =document.getElementById("buchliste");
+
+            liste.innerHTML = "";
+
+            if(daten.length == 0) {
+               liste.innerHTML = "<h3>Kein Exemplar vorhanden.</h3>";
+                return;
+              }
+
+            for(let i=0;i<daten.length; i++) {
+
+                liste.innerHTML +=
+
+                "<div class='buchkarte'>"
+                + "<div class='buchIcon'>📘</div>"
+                + "<div class='buchInfo'>"
+                
+                +"<h3>Buch Id: "+daten[i].buchid+"</h3>"
+                +"<h3>Titel: "+ daten[i].titel+ "</h3>"
+                + "<p>Autor: "+ daten[i].autor+ "</p>"
+                + "<p>Barcode: "+ daten[i].barcode+ "</p>"
+                + "<p>Standort: "+ daten[i].standort + "</p>"
+                + "<p>Regal: "+ daten[i].regal+ "</p>"
+                + "<p>Genre: "+ daten[i].genre+ "</p>"
+                + "<p>Zustand: "+ daten[i].zustand+ "</p>"
+                + "<p>Status: "
+                + (daten[i].zustand == "BESCHAEDIGT" && daten[i].verfuegbar == 2
+                       ? "<span style='color:blue;font-weight:bold'>Beschädigt</span>"
+                       : daten[i].zustand == "VERMISST" && daten[i].verfuegbar == 2
+                       ? "<span style='color:blue;font-weight:bold'>Vermisst</span>"
+                       : daten[i].verfuegbar == 1
+                       ? "<span style='color:green;font-weight:bold'>Verfügbar</span>"
+                       : daten[i].verfuegbar == 0
+                       ? "<span style='color:red;font-weight:bold'>Ausgeliehen</span>"
+                       : daten[i].verfuegbar == 3
+                       ? "<span style='color:brown;font-weight:bold'>Reserviert</span>"
+                       : "")+ "</p>"
+
+                + "</div>"
+                + "<div class='buchAktionen'>"
+                + "<button type='button' class='deleteBtn' onclick=\"loescheExemplar('" + daten[i].id + "')\"> Löschen"+ "</button>"
+                + "</div>"
+                + "</div>";
+            }
+        }else if(request.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+
+        }else{
+              alert("Fehler beim Laden der Bücher");
+
+            }
+        }
+    };
+
+    request.open("GET", url, true);
+    request.send();
+}
+
+
+
+function loescheExemplar(id) {
+
+    if (!confirm("Möchten Sie diese Exemplar wirklich löschen?")) {
+        return;
+    }
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                alert(request.responseText);
+                ladeExemplar();
+       
+            } else {
+                alert("Fehler beim Löschen des Exemplars");
+            }
+        }
+    }
+    request.open("POST", "exemplarloeschen", true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("id=" +id);
+}
+
+
+
+function sucheExemplar() {
+
+    let suchtext = document.getElementById("searchInput").value.toLowerCase();
+
+    let karten = document.getElementsByClassName("buchkarte");
+
+    for (let i = 0; i < karten.length; i++) {
+
+        let text = karten[i].innerText.toLowerCase();
+        if (text.includes(suchtext)) {
+            karten[i].style.display = "flex";
+        } else {
+            karten[i].style.display = "none";
+      }
+    }
+  }
+
+window.onload=ladeExemplar;
+
+</script>
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="manager.html">Home</a>
+        <a href="standort.html">Standort Hinzufügen</a> 
+        <a  id="yes" href="exemplarAnsehen.html">Alle Exemplare</a>
+        <a href="mitarbeiterliste.html">Mitarbeiter Liste</a>
+        <a href="addmitarbeiter.html">Mitarbeiter Hinzufügen</a>      
+        <a href="mitgliedListe.html">Mitglieder Liste</a>
+        <a href="managerHistory.html">Mitglieder History</a>
+        <a href="inventur.html">Inventur</a>
+        <a href="statistik.html">Statistik</a>
+
+
+
+     <form action="logout" method="POST">
+    <button type="submit">Logout</button>
+   </form>
+
+    </div>
+
+    <div class="content">
+
+        <div class="page-header">
+        
+            <h1>Manager Seite</h1>
+        
+    
+      </div>
+
+  <div class="search-box">
+    <span>⌕</span>
+   <input type="text" id="searchInput" placeholder="Titel, Autor, Barcode oder Standort..." onkeyup="sucheExemplar()">    
+  </div>
+ 
+  <div id="buchliste">
+
+  </div>
+
+
+
+    
+    </div>
+
+</div>
+
+
+
+</body>
+
+</html>

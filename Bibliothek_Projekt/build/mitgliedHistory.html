@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+<script>
+
+function ladeReservierung() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+        if(request.readyState == 4) {
+            if(request.status == 200) {
+
+                let daten = JSON.parse(request.responseText);
+                let body = document.getElementById("body");
+
+                body.innerHTML = "";
+
+                if(daten.length == 0) {
+                  body.innerHTML ="<tr> <td colspan='8'> <h3>Keine Historie vorhanden.</h3></td></tr>";
+                    return;
+                }
+
+                for(let i = 0; i < daten.length; i++) {
+
+                    let statusText = "";
+
+                    if(daten[i].status == "AUSGELIEHEN") {
+                        statusText ="<span style='color:red;font-weight:bold'>Ausgeliehen</span>";
+
+                    } else if(daten[i].status == "ZURUECKGEGEBEN") {
+                        statusText ="<span style='color:green;font-weight:bold'>Zurückgegeben </span>";
+                    
+                    } else if(daten[i].status == "RESERVIERT" ) {
+                        statusText ="<span style='color:brown;font-weight:bold'>Reserviert </span>";
+
+                    } else if(daten[i].status == "WARENKORB" ) {
+                        statusText ="<span style='color:brown;font-weight:bold'>Im Warenkorb </span>";
+                    } else{
+                        statusText ="<span style='color:orange;font-weight:bold'>Rückgabe Angefragt</span>";
+                    }
+
+
+                     let ausgeliehenAnzeige = daten[i].ausgeliehenAm;
+                     let rueckgabeAnzeige = daten[i].zurueckgeben;
+
+                     if(daten[i].status == "RESERVIERT") {
+                       rueckgabeAnzeige = "-";
+
+                     } else if(daten[i].status == "WARENKORB") {
+
+                       ausgeliehenAnzeige = "-";
+                       rueckgabeAnzeige = "-";
+                     }
+
+                   let fehlTageAnzeige = "";
+                 if(daten[i].fehlTage >= 14) {
+                    fehlTageAnzeige = "<span style='color:red;font-weight:bold'>" + daten[i].fehlTage
+                    + " (Überfällig)" + "</span>";
+                }else {
+                   fehlTageAnzeige = daten[i].fehlTage;
+                }
+
+
+
+                  let GebuehrAnzeige = "";
+
+                  let gebuehr = Number(daten[i].gebuehr);
+
+                  if(daten[i].status == "ZURUECKGEGEBEN" && gebuehr > 0) {
+                    GebuehrAnzeige = "<p>Gebühr: "+ gebuehr.toFixed(2) +
+                     "<span style='color:green;font-weight:bold'>" + " € (Bezahlt)</span>" + "</p>";
+
+                 }else {
+                   GebuehrAnzeige ="<p>Gebühr: "+ gebuehr.toFixed(2) + " €" + "</p>";
+                  }
+
+                  body.innerHTML +=
+
+                        "<tr>"
+
+                        + "<td>" + daten[i].id + "</td>"
+                        + "<td>" + daten[i].exemplarId + "</td>"
+                        + "<td>" + daten[i].titel + "</td>"
+                        + "<td>" + daten[i].barcode + "</td>"
+                        + "<td>" + daten[i].standort + "</td>"
+
+
+                        + "<td>" + ausgeliehenAnzeige + "</td>"
+                        + "<td>" + rueckgabeAnzeige + "</td>"
+
+                        + "<td>" + GebuehrAnzeige + "</td>"
+                        + "<td>" + fehlTageAnzeige + "</td>"
+
+                        + "<td>" + statusText + "</td>"
+                        + "</tr>";
+                }
+
+            } else if(request.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+
+            } else {
+                alert("Fehler beim Laden der Historie.");
+            }
+        }
+    };
+    request.open("GET", "mitgliedHistorie",true);
+    request.send();
+}
+
+
+window.onload = function() {
+    ladeReservierung();
+}
+
+</script>
+
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="mitglied.html">Home</a>
+        <a href="mitgliedReservierung.html">Reservierten</a>
+        <a href="mitgliedWarenkorb.html">Warenkorb</a>
+        <a href="mitgliedAusleiheListe.html">Ausleihe Ansehen</a>
+        <a id="yes" href="#">Historie</a>
+      
+           
+       
+  <form action="logout" method="POST">
+    <button type="submit">Logout</button>
+   </form>
+
+    </div>
+
+    <div class="content">
+
+        <div class="page-header">
+        
+            <h1>Meine History</h1>
+        
+    
+      </div>
+
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Exemplar_Id</th>
+              <th>Name</th>
+              <th>Barcode</th>
+              <th>Standort</th>
+              <th>Ausgeliehen Am/ Reserviert Am</th>
+              <th>Rückgabedatum </th>
+              <th>Gebühr</th>
+              <th>Fehltage</th> 
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="body">
+
+
+
+          </tbody>
+
+
+        </table>
+
+
+      </div>
+  
+    </div>
+
+</div>
+
+</body>
+
+</html>

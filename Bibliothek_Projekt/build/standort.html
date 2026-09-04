@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+
+<script>
+
+ function addStandort(){
+ let request=new XMLHttpRequest();
+
+let Name=document.getElementById("name").value.trim();
+let Strasse= document.getElementById("strasse").value.trim();
+let PLZ = document.getElementById("plz").value.trim();
+let Ort=document.getElementById("ort").value.trim();
+
+  if(!Name||!Strasse||!PLZ||!Ort){
+   alert("Bitte alle Felder ausfüllen");
+   return;
+  }
+
+request.onreadystatechange= function(){
+ if(request.readyState==4){
+   if(request.status==200){
+
+    alert("Standort Erfolgreich Hinzugefügt");
+    document.getElementById("buchform").reset();
+    standortLaden();
+    return;
+  
+ }else if(request.status == 401) {
+     alert("Sie sind nicht eingeloggt.");
+
+   }else{
+    alert("Fehler beim Hinzufügen");
+    }
+  }
+ }
+ request.open("POST","addStandort",true);
+ request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+ request.send("name="+ Name + "&strasse="+ Strasse + "&plz="+ PLZ + "&ort="+Ort);
+}
+
+
+function standortLaden(){
+
+let request=new XMLHttpRequest();
+
+request.onreadystatechange= function(){
+ if(request.readyState==4){
+   if(request.status==200){
+
+   let inhalt=JSON.parse(request.responseText);
+   let body=document.getElementById("tbody");
+    body.innerHTML = "";
+
+    for(let i=0;i<inhalt.length;i++){
+     body.innerHTML+="<tr>"
+       +"<td>"+inhalt[i].id +"</td>"
+        +"<td>"+inhalt[i].name+"</td>"
+        +"<td>"+inhalt[i].strasse+"</td>"
+        +"<td>"+inhalt[i].plz+"</td>"
+        +"<td>"+inhalt[i].ort+"</td>"
+        +"</tr>";  
+    }
+   }else if(request.status == 401) {
+     alert("Sie sind nicht eingeloggt.");
+
+   }else{
+     alert("Fehler beim Laden von Standorte");
+    }
+  }
+ }
+request.open("GET","standortliste",true);
+request.send();
+}
+
+ window.onload=standortLaden;
+
+</script>
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a href="manager.html">Home</a>
+
+         <a id="yes" href="#">Standort Hinzufügen</a> 
+         <a href="exemplarAnsehen.html">Alle Exemplare</a>
+         <a href="mitarbeiterliste.html">Mitarbeiter Liste</a>
+         <a href="addmitarbeiter.html">Mitarbeiter Hinzufügen</a>
+         <a href="mitgliedListe.html">Mitglieder Liste</a>
+         <a href="managerHistory.html">Mitglieder History</a>
+         <a href="inventur.html">Inventur</a>
+         <a href="statistik.html">Statistik</a>
+         
+   <form action="logout" method="POST">
+     <button type="submit">Logout</button>
+   </form>
+    </div>
+
+    <div class="content">
+
+        <div class="header">
+        
+            <h1>Manager Dashboard</h1>
+        
+    
+            <br>
+            <br>
+
+    <main class="main-content">
+
+    <div class="formular">     
+    <h2>Neue Standort hinzufügen</h2>
+
+
+   <form id="buchform">
+
+    <label for="name">Name des Standorts</label>
+    <input type="text"
+           id="name"
+           name="name"
+           required>
+
+    <label for="strasse">Straße</label>
+    <input type="text"
+           id="strasse"
+           name="strasse"
+           required>
+
+    <label for="plz">PLZ</label>
+    <input type="number"
+           id="plz"
+           name="plz"
+           required>
+
+    <label for="ort">Ort</label>
+    <input type="text"
+           id="ort"
+           name="ort"
+           required>
+       
+    <button onclick="addStandort()" type="button">Hinzufügen</button>
+    <br><hr>
+
+</form>
+<br>
+   <div id="error-container" class="error-container" style="color:red;
+    font-size: 20px;
+    font-family: Comic Sans MS">
+</div>    
+<hr>
+<br>
+<br>
+   <h3>Hinzugefügte Standorte</h3>
+   <br>
+   <div class="table-container">
+   <table>
+     <thead>
+       <tr>
+       <th>Id</th>
+       <th>Name</th>
+       <th>Straße</th>
+       <th>PLZ</th>
+       <th>Ort</th>
+       </tr>
+     </thead>
+
+     <tbody id="tbody">
+     
+     </tbody>
+   </table>
+   </div>
+    </div>
+
+
+    </main>
+
+
+        </div>
+   
+        
+
+
+
+
+    </div>
+    
+   
+
+
+
+</body>
+
+</html>

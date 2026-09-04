@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+
+  <display-name>SWE 3 Mini App</display-name>
+
+  <context-param>
+    <param-name>redispassword</param-name>
+    <param-value>JX0dC9sNhaFJPFNEqR5c</param-value>
+  </context-param>
+  <context-param>
+    <param-name>redisserver</param-name>
+    <param-value>localhost</param-value>
+  </context-param>
+
+<context-param>
+    <param-name>mailuser</param-name>
+    <param-value>thorragnarog33@gmail.com</param-value>
+</context-param>
+
+<context-param>
+    <param-name>mailpassword</param-name>
+    <param-value>xlzkouzituxrqzrm</param-value>
+</context-param>
+
+
+  <listener>
+    <listener-class>hbv.web.MyContextListener</listener-class>
+  </listener>
+
+  
+  <servlet>
+    <servlet-name>MitgliedLoginServlet</servlet-name>
+    <servlet-class>hbv.web.MitgliedLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MitgliedLoginServlet</servlet-name>
+    <url-pattern>/mitgliedlogin</url-pattern>
+  </servlet-mapping>
+
+
+
+
+   <servlet>
+    <servlet-name>ManagementLoginServlet</servlet-name>
+    <servlet-class>hbv.web.ManagementLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManagementLoginServlet</servlet-name>
+    <url-pattern>/managementlogin</url-pattern>
+  </servlet-mapping>
+
+ <servlet>
+    <servlet-name>addmitarbeiterServlet</servlet-name>
+    <servlet-class>hbv.web.addmitarbeiterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>addmitarbeiterServlet</servlet-name>
+    <url-pattern>/addmitarbeiter</url-pattern>
+  </servlet-mapping>
+
+
+ <servlet>
+    <servlet-name>addBuchServlet</servlet-name>
+    <servlet-class>hbv.web.addBuchServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>addBuchServlet</servlet-name>
+    <url-pattern>/addbuch</url-pattern>
+  </servlet-mapping>
+
+    
+<servlet>
+  <servlet-name>BuchListeServlet</servlet-name>
+    <servlet-class>hbv.web.BuchListeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BuchListeServlet</servlet-name>
+    <url-pattern>/buchliste</url-pattern>
+  </servlet-mapping>
+
+ 
+
+<servlet>
+  <servlet-name>BuchLoeschenServlet</servlet-name>
+    <servlet-class>hbv.web.BuchLoeschenServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BuchLoeschenServlet</servlet-name>
+    <url-pattern>/buchloeschen</url-pattern>
+  </servlet-mapping>
+
+
+<servlet>
+  <servlet-name>addStandortServlet</servlet-name>
+    <servlet-class>hbv.web.addStandortServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>addStandortServlet</servlet-name>
+    <url-pattern>/addStandort</url-pattern>
+  </servlet-mapping>
+
+<servlet>
+  <servlet-name>StandortListe</servlet-name>
+    <servlet-class>hbv.web.StandortListe</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>StandortListe</servlet-name>
+    <url-pattern>/standortliste</url-pattern>
+  </servlet-mapping>
+
+<servlet>
+  <servlet-name>addExemplarServlet</servlet-name>
+    <servlet-class>hbv.web.addExemplarServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>addExemplarServlet</servlet-name>
+    <url-pattern>/addexemplar</url-pattern>
+  </servlet-mapping>
+
+
+
+<servlet>
+  <servlet-name>ExemplarLoeschenServlet</servlet-name>
+    <servlet-class>hbv.web.ExemplarLoeschenServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ExemplarLoeschenServlet</servlet-name>
+    <url-pattern>/exemplarloeschen</url-pattern>
+  </servlet-mapping>
+
+
+
+<servlet>
+  <servlet-name>exemplarListeServlet</servlet-name>
+    <servlet-class>hbv.web.exemplarListeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>exemplarListeServlet</servlet-name>
+    <url-pattern>/exemplarliste</url-pattern>
+  </servlet-mapping>
+
+
+<servlet>
+  <servlet-name>MitarbeiterListeServlet</servlet-name>
+    <servlet-class>hbv.web.MitarbeiterListeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MitarbeiterListeServlet</servlet-name>
+    <url-pattern>/mitarbeiterliste</url-pattern>
+  </servlet-mapping>
+
+
+<servlet>
+  <servlet-name>MitarbeiterLoeschenServlet</servlet-name>
+    <servlet-class>hbv.web.MitarbeiterLoeschenServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MitarbeiterLoeschenServlet</servlet-name>
+    <url-pattern>/mitarbeiterloeschen</url-pattern>
+  </servlet-mapping>
+<servlet>
+  <servlet-name>MitgliedListeServlet</servlet-name>
+    <servlet-class>hbv.web.MitgliedListeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MitgliedListeServlet</servlet-name>
+    <url-pattern>/mitgliedliste</url-pattern>
+  </servlet-mapping>
+
+<servlet>
+    <servlet-name>ProfilServlet</servlet-name>
+    <servlet-class>hbv.web.ProfilServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>ProfilServlet</servlet-name>
+    <url-pattern>/profil</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>MitgliedExemplarServlet</servlet-name>
+    <servlet-class>hbv.web.MitgliedExemplarServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>MitgliedExemplarServlet</servlet-name>
+    <url-pattern>/mitgliedExemplar</url-pattern>
+</servlet-mapping>
+
+
+
+
+<servlet>
+  <servlet-name>ExemplarReservierenServlet</servlet-name>
+  <servlet-class>hbv.web.ExemplarReservierenServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>ExemplarReservierenServlet</servlet-name>
+  <url-pattern>/exemplarReservieren</url-pattern>
+</servlet-mapping>
+
+
+
+
+<servlet>
+  <servlet-name>ExemplarWarenkorbServlet</servlet-name>
+  <servlet-class>hbv.web.ExemplarWarenkorbServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>ExemplarWarenkorbServlet</servlet-name>
+  <url-pattern>/warenkorb</url-pattern>
+</servlet-mapping>
+
+
+
+
+
+<servlet-mapping>
+  <servlet-name>WarenkorbAlleReservierenServlet</servlet-name>
+  <url-pattern>/warenkorbAlleReservieren</url-pattern>
+</servlet-mapping>
+
+
+<servlet>
+  <servlet-name>WarenkorbAlleReservierenServlet</servlet-name>
+  <servlet-class>hbv.web.WarenkorbAlleReservierenServlet</servlet-class>
+</servlet>
+
+
+
+
+
+<servlet>
+    <servlet-name>MitarbeiterBenachrichtigungServlet</servlet-name>
+
+    <servlet-class>
+        hbv.web.MitarbeiterBenachrichtigungServlet
+    </servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MitarbeiterBenachrichtigungServlet</servlet-name>
+
+    <url-pattern>/mitarbeiterBenachrichtigung</url-pattern>
+</servlet-mapping>
+
+
+
+<servlet>
+    <servlet-name>MitarbeiterRückgabeBenachrichtigungServlet</servlet-name>
+
+    <servlet-class>hbv.web.MitarbeiterRückgabeBenachrichtigungServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MitarbeiterRückgabeBenachrichtigungServlet</servlet-name>
+
+    <url-pattern>/mitarbeiterRueckgabeBenachrichtigung</url-pattern>
+</servlet-mapping>
+
+
+
+<servlet>
+    <servlet-name>MitgliedAusleiheAnsehenServlet</servlet-name>
+
+    <servlet-class>
+        hbv.web.MitgliedAusleiheAnsehenServlet
+    </servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MitgliedAusleiheAnsehenServlet</servlet-name>
+
+    <url-pattern>/mitgliedAusleiheAnsehen</url-pattern>
+</servlet-mapping>
+
+
+
+
+<servlet>
+    <servlet-name>MitgliedHistorieServlet</servlet-name>
+
+    <servlet-class>
+        hbv.web.MitgliedHistorieServlet
+    </servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MitgliedHistorieServlet</servlet-name>
+
+    <url-pattern>/mitgliedHistorie</url-pattern>
+</servlet-mapping>
+
+
+<servlet>
+    <servlet-name>MitarbeiterHistorieServlet</servlet-name>
+    <servlet-class>hbv.web.MitarbeiterHistorieServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>MitarbeiterHistorieServlet</servlet-name>
+    <url-pattern>/mitarbeiterHistorie</url-pattern>
+</servlet-mapping>
+
+
+
+
+<servlet>
+    <servlet-name>ExemplarRueckgabeServlet</servlet-name>
+    <servlet-class>hbv.web.ExemplarRueckgabeServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>ExemplarRueckgabeServlet</servlet-name>
+    <url-pattern>/exemplarRueckgabe</url-pattern>
+</servlet-mapping>
+
+
+
+
+
+
+
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>hbv.web.LogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+
+
+
+
+
+
+<servlet>
+    <servlet-name>MitgliedAusleihePdfServlet</servlet-name>
+    <servlet-class>hbv.web.MitgliedAusleihePdfServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MitgliedAusleihePdfServlet</servlet-name>
+    <url-pattern>/mitgliedAusleihePdf</url-pattern>
+</servlet-mapping>
+
+
+<servlet>
+    <servlet-name>MitgliedAusleiheQrAnzeigeServlet</servlet-name>
+    <servlet-class>hbv.web.MitgliedAusleiheQrAnzeigeServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MitgliedAusleiheQrAnzeigeServlet</servlet-name>
+    <url-pattern>/mitgliedAusleiheQrAnzeige</url-pattern>
+</servlet-mapping>
+
+
+
+
+
+
+
+<servlet>
+    <servlet-name>InventurStartServlet</servlet-name>
+    <servlet-class>hbv.web.InventurStartServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>InventurStartServlet</servlet-name>
+    <url-pattern>/inventurStart</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>InventurListeServlet</servlet-name>
+    <servlet-class>hbv.web.InventurListeServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>InventurListeServlet</servlet-name>
+    <url-pattern>/inventurListe</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>InventurErfassenServlet</servlet-name>
+    <servlet-class>hbv.web.InventurErfassenServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>InventurErfassenServlet</servlet-name>
+    <url-pattern>/inventurErfassen</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>InventurAbschliessenServlet</servlet-name>
+    <servlet-class>hbv.web.InventurAbschliessenServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>InventurAbschliessenServlet</servlet-name>
+    <url-pattern>/inventurAbschliessen</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>InventurLoeschenServlet</servlet-name>
+    <servlet-class>hbv.web.InventurLoeschenServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>InventurLoeschenServlet</servlet-name>
+    <url-pattern>/inventurLoeschen</url-pattern>
+  </servlet-mapping>
+
+
+
+
+
+  <servlet>
+    <servlet-name>StatistikServlet</servlet-name>
+    <servlet-class>hbv.web.StatistikServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>StatistikServlet</servlet-name>
+    <url-pattern>/statistik</url-pattern>
+</servlet-mapping>
+
+
+
+
+  
+  <filter> 
+    <filter-name>myfilter</filter-name>
+    <filter-class>hbv.web.MyFilter</filter-class> 
+    <async-supported>true</async-supported> 
+  </filter> 
+
+  <filter-mapping> 
+    <filter-name>myfilter</filter-name>
+    <url-pattern>/*</url-pattern> 
+  </filter-mapping> 
+
+
+
+ <servlet>
+    <servlet-name>registrierenServlet</servlet-name>
+    <servlet-class>hbv.web.registrierenServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>registrierenServlet</servlet-name>
+    <url-pattern>/registration</url-pattern>
+  </servlet-mapping>
+
+
+
+ 
+
+
+</web-app>  

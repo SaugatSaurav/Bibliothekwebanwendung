@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+<script>
+
+let gesperrtAlertSchonGezeigt = false;
+function ladeBuch() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+
+      if(request.readyState == 4){
+        if(request.status == 200) {
+
+            let daten =JSON.parse(request.responseText);
+
+            let liste =document.getElementById("buchliste");
+
+            liste.innerHTML = "";
+
+          if(daten.length == 0) {
+               liste.innerHTML = "<h3>Kein Buch vorhanden.</h3>";
+                return;
+              }
+
+            for(let i=0;i<daten.length; i++) {
+
+                liste.innerHTML +=
+                "<div class='buchkarte' onclick=\"location.href='mitgliedAusleihe.html?buch_id="+ daten[i].id + "'\">"
+                + "<div class='buchIcon'>📘</div>"
+
+                + "<div class='buchInfo'>"
+
+                + "<h3>"+ daten[i].titel + "</h3>"
+
+                + "<p>Autor: "+ daten[i].autor + "</p>"
+
+                + "<p>ISBN: "+ daten[i].isbn + "</p>"
+
+                + "<p>Erscheinungsjahr: " + daten[i].erscheinungsjahr + "</p>"  
+
+                + "<p>Genre: " + daten[i].genre + "</p>"
+
+                + "<p>Verfügbare Exemplare: "+ daten[i].verfuegbar_count+ "</p>"               
+                + "</div>"
+                + "</div>";
+            }
+        }   else if(request.status == 401) {
+
+                alert("Sie sind nicht eingeloggt.");
+
+            } else if(request.status == 403) {
+            
+          if(gesperrtAlertSchonGezeigt == false) {
+          
+            alert("Ihr Konto ist gesperrt.");
+
+             let liste = document.getElementById("buchliste");
+             liste.innerHTML = "";
+            
+            gesperrtAlertSchonGezeigt = true;
+            }
+          }else{
+              alert("Fehler beim Laden der Bücher");
+
+            }
+
+        }
+    };
+
+    request.open("GET", "buchliste", true);
+    request.send();
+}
+
+
+
+function sucheBuch() {
+
+    let suchtext = document.getElementById("searchInput").value.toLowerCase();
+
+    let karten = document.getElementsByClassName("buchkarte");
+
+    for (let i = 0; i < karten.length; i++) {
+
+        let text = karten[i].innerText.toLowerCase();
+
+        if (text.includes(suchtext)) {
+            karten[i].style.display = "flex";
+        } else {
+            karten[i].style.display = "none";
+        }
+    }
+}
+
+//Profil
+
+function zeigeProfil() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+
+        if(request.readyState == 4 && request.status == 200) {
+
+            let daten = JSON.parse(request.responseText);
+
+            document.getElementById("profilId").innerText = daten.id;
+            document.getElementById("profilName").innerText =daten.name;
+            document.getElementById("profilAdresse").innerText =daten.addresse;
+            document.getElementById("profilEmail").innerText = daten.email;
+            document.getElementById("profilStatus").innerText =daten.stat;
+            document.getElementById("profilDatum").innerText = daten.datum;
+            document.getElementById("overlay").style.display ="block"
+            document.getElementById("profilModal").style.display ="block";
+        }
+    };
+
+    request.open("GET","profil",true);
+    request.send();
+}
+
+function closeProfilModal() {
+
+    document.getElementById("overlay").style.display ="none";
+
+    document.getElementById("profilModal").style.display ="none";
+}
+
+
+ window.onload=function(){
+
+ ladeBuch();
+
+   setInterval(function() {
+
+        ladeBuch();
+
+    }, 5000);
+};
+
+
+</script>
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a id="yes" href="#">Home</a>
+        <a href="#" onclick="zeigeProfil()">Profil</a>
+        <a href="mitgliedReservierung.html">Reservierte</a>
+        <a href="mitgliedWarenkorb.html">Warenkorb</a>
+        <a href="mitgliedAusleiheListe.html">Ausleihe Ansehen</a>
+        <a href="mitgliedHistory.html">Historie</a>
+        
+   <form action="logout" method="POST">
+    <button type="submit">Logout</button>
+   </form>
+
+    </div>
+
+    <div class="content">
+
+        <div class="page-header">
+        
+            <h1>Mitglied Home</h1>
+        
+    
+      </div>
+
+<div class="search-box">
+    <span>⌕</span>
+ 
+ <input type="text" id="searchInput" placeholder="Titel, Autor, ISBN, Standort oder Genre..." onkeyup="sucheBuch()">
+  </div>
+
+<div id="buchliste">
+
+</div>
+  
+    </div>
+
+</div>
+<div id="overlay" class="overlay"></div>
+
+<div id="profilModal" class="modal">
+
+    <h2>Mitglied Profil</h2>
+
+    <p>
+        <b>ID: </b>
+        <span id="profilId"></span>
+    </p>
+
+    <p>
+       <b>Name: </b>
+       <span id="profilName"></span>
+    </p>
+
+
+ <p>
+     <b>Adresse: </b>
+     <span id="profilAdresse"></span>
+ </p>
+
+  
+    <p>
+        <b>Email: </b>
+        <span id="profilEmail"></span>
+    </p>
+
+    <p>
+        <b>Status: </b>
+        <span id="profilStatus"></span>
+    </p>
+
+    <p>
+        <b>Mitglied Seit: </b>
+        <span id="profilDatum"></span>
+    </p>
+
+       <button
+        type="button"onclick="closeProfilModal()">Schließen</button>
+
+</div>
+
+</body>
+
+</html>

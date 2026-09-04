@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Inventur</title>
+<link rel="stylesheet" href="management.css">
+
+<script>
+let aktiverButton = null;
+let vorherigerBereich = null;
+
+function toggle(bereich) {
+    if (aktiverButton == bereich) { back(); return; }
+    document.getElementById('hauptbuttons').classList.add('hide');
+
+    let bereiche = ['bereichStart','bereichLaufend','bereichAbgeschlossen','bereichDetails'];
+    bereiche.forEach(function(id) {
+        document.getElementById(id).classList.add('hide');
+    });
+
+    let map = {start:'bereichStart', laufend:'bereichLaufend', abgeschlossen:'bereichAbgeschlossen', details:'bereichDetails'};
+    document.getElementById(map[bereich]).classList.remove('hide');
+
+    if (bereich == 'laufend') ladeInventur('LAUFEND');
+    if (bereich == 'abgeschlossen') ladeInventur('ABGESCHLOSSEN');
+
+    aktiverButton = bereich;
+}
+
+function back() {
+    let bereiche = ['bereichStart','bereichLaufend','bereichAbgeschlossen','bereichDetails'];
+    bereiche.forEach(function(id) {
+        document.getElementById(id).classList.add('hide');
+    });
+    document.getElementById('hauptbuttons').classList.remove('hide');
+    aktiverButton = null;
+    vorherigerBereich = null;
+}
+
+function backToList() {
+    document.getElementById("bereichDetails").classList.add('hide');
+    if (vorherigerBereich) {
+        document.getElementById(vorherigerBereich).classList.remove('hide');
+        vorherigerBereich = null;
+    } else {
+        document.getElementById('hauptbuttons').classList.remove('hide');
+        aktiverButton = null;
+    }
+}
+
+function sucheInventur(status) {
+    let inputId = status == 'LAUFEND' ? 'sucheLaufend' : 'sucheAbgeschlossen';
+    let containerId = status == 'LAUFEND' ? 'inventurListeLaufend' : 'inventurListeAbgeschlossen';
+    let suchtext = document.getElementById(inputId).value.toLowerCase();
+    let karten = document.getElementById(containerId).querySelectorAll('.inventur-card');
+    karten.forEach(function(k) {
+        if (k.innerText.toLowerCase().includes(suchtext)) {
+            k.style.display = '';
+        } else {
+            k.style.display = 'none';
+        }
+    });
+}
+
+function starte() {
+    let id = document.getElementById("standortSelect").value;
+    if (!id) { alert("Bitte Standort wählen!"); return; }
+    if (!confirm("Inventur starten?")) return;
+
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                let r = JSON.parse(req.responseText);
+                alert("Inventur gestartet! " + r.exemplareCount + " Exemplare.");
+                document.getElementById('bereichStart').classList.add('hide');
+                ladeExemplare(r.inventurId);
+                document.getElementById('hauptbuttons').classList.add('hide');
+                aktiverButton = 'details';
+            } else if (req.status == 401) {
+                alert(request.responseText);
+            } else {
+                alert("Fehler beim Starten der Inventur");
+            }
+        }
+    };
+    req.open("POST", "inventurStart", true);
+    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.send("standortId=" + id);
+}
+
+function ladeInventur(status) {
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                let alleDaten = JSON.parse(req.responseText);
+                let data = alleDaten.filter(function(d) { return d.status == status; });
+                let containerId = status == 'LAUFEND' ? 'inventurListeLaufend' : 'inventurListeAbgeschlossen';
+                let container = document.getElementById(containerId);
+                container.innerHTML = "";
+
+                if (!data.length) {
+                    let text = status == 'LAUFEND' ? 'laufenden' : 'abgeschlossenen';
+                    container.innerHTML = "<p class='info-text'>Keine " + text + " Inventuren vorhanden.</p>";
+                    return;
+                }
+
+                let grid = document.createElement('div');
+                grid.className = 'inventur-grid';
+
+                data.forEach(function(d) {
+                    let erg = "";
+                    if (d.status == "ABGESCHLOSSEN") {
+                        let neu = d.neu;
+                        let gut = d.gut;
+                        let beschadigt = d.beschadigt;
+                        let vermisst = d.vermisst;
+
+                        erg = "<div class='ergebnisse'>"
+                            + "<span class='ergebnis-item ergebnis-neu'>NEU: " + neu + "</span>"
+                            + "<span class='ergebnis-item ergebnis-gut'>GUT: " + gut + "</span>"
+                            + "<span class='ergebnis-item ergebnis-beschaedigt'>BESCHÄDIGT: " + beschadigt + "</span>"
+                            + "<span class='ergebnis-item ergebnis-vermisst'>VERMISST: " + vermisst + "</span>"
+                            + "</div>";
+                    }
+
+                    let datumZeile = "<p><strong>Gestartet:</strong> " + d.startDatum + "</p>";
+                    if (d.status == "ABGESCHLOSSEN" && d.endDatum && d.endDatum != "-") {
+                        datumZeile += "<p><strong>Abgeschlossen:</strong> " + d.endDatum + "</p>";
+                    }
+
+                    let btns;
+                    if (d.status == "LAUFEND") {
+                        btns = "<button onclick='ladeExemplare(" + d.id + ")' class='btn-start'>Weiter</button>"
+                             + "<button onclick='beenden(" + d.id + ")' class='btn-abschliessen'>Abschließen</button>";
+                    } else {
+                        btns = "<button onclick='ladeExemplare(" + d.id + ")' class='btn-details'>Details anzeigen</button>"
+                             + "<button onclick='loescheInventur(" + d.id + ")' class='btn-loeschen'>Löschen</button>";
+                    }
+
+                    let card = document.createElement('div');
+                    card.className = 'inventur-card';
+                    card.id = 'inventurCard-' + d.id;
+                    card.innerHTML =
+                        "<div class='inventur-card-header'><h3>Standort: " + d.standort + "</h3></div>"
+                        + "<div>"
+                        + datumZeile
+                        + erg
+                        + "<div class='inventur-actions'>" + btns + "</div>"
+                        + "</div>";
+                    grid.appendChild(card);
+                });
+
+                container.appendChild(grid);
+            } else if (req.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+            } else {
+                alert("Fehler beim Laden der Inventuren");
+            }
+        }
+    };
+    req.open("GET", "inventurListe", true);
+    req.send();
+}
+
+function ladeExemplare(inventurId) {
+    let laufend = document.getElementById('bereichLaufend');
+    let abgeschlossen = document.getElementById('bereichAbgeschlossen');
+    if (!laufend.classList.contains('hide')) {
+        vorherigerBereich = 'bereichLaufend';
+        laufend.classList.add('hide');
+    } else if (!abgeschlossen.classList.contains('hide')) {
+        vorherigerBereich = 'bereichAbgeschlossen';
+        abgeschlossen.classList.add('hide');
+    }
+
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                let data = JSON.parse(req.responseText);
+                let container = document.getElementById("exemplarContainer");
+                container.innerHTML = "";
+                document.getElementById("bereichDetails").classList.remove('hide');
+
+                if (!data.length) {
+                    container.innerHTML = "<p>Keine Exemplare.</p>";
+                    return;
+                }
+
+                let erfasst = 0, total = data.length;
+                data.forEach(function(d) {
+                    let cls = "offen", badge = "";
+                    let disabledNeu = "", disabledGut = "", disabledBeschaedigt = "", disabledVermisst = "";
+
+                    if (d.statusNeu !== null) {
+                        cls = "erfasst";
+                        erfasst++;
+                        badge = "<span class='erfasst-badge'>Erfasst</span>";
+                        disabledNeu = "disabled";
+                        disabledGut = "disabled";
+                        disabledBeschaedigt = "disabled";
+                        disabledVermisst = "disabled";
+                    } else {
+                        let aktuellerZustand = d.zustand;
+
+                        if (aktuellerZustand === 'NEU') {
+                        } else if (aktuellerZustand === 'GUT') {
+                            disabledNeu = "disabled";
+                        } else if (aktuellerZustand === 'BESCHAEDIGT') {
+                            disabledNeu = "disabled";
+                            disabledGut = "disabled";
+                        } else if (aktuellerZustand === 'VERMISST') {
+                            disabledNeu = "disabled";
+                            disabledGut = "disabled";
+                            disabledBeschaedigt = "disabled";
+                        }
+                    }
+
+                    container.innerHTML +=
+                        "<div class='exemplar-card " + cls + "'>"
+                        + "<h3>" + d.titel + " " + badge + "</h3>"
+                        + "<div class='details'><strong>Exemplar-ID:</strong> " + d.exemplarId + "</div>"
+                        + "<div class='details'><strong>Autor:</strong> " + d.autor + "</div>"
+                        + "<div class='details'><strong>Barcode:</strong> " + d.barcode + "</div>"
+                        + "<div class='details'><strong>Standort:</strong> " + d.standort + " | <strong>Regal:</strong> " + d.regal + "</div>"
+                        + "<div class='details'><strong>Aktueller Zustand:</strong> <span style='font-weight:bold;color:#2c3e50;'>" + d.zustand + "</span></div>"
+                        + "<div class='actions'>"
+                        + "<button onclick='erfassen(" + d.id + "," + inventurId + ",\"NEU\")' class='btn-neu' " + disabledNeu + ">NEU</button>"
+                        + "<button onclick='erfassen(" + d.id + "," + inventurId + ",\"GUT\")' class='btn-gut' " + disabledGut + ">GUT</button>"
+                        + "<button onclick='erfassen(" + d.id + "," + inventurId + ",\"BESCHAEDIGT\")' class='btn-beschaedigt' " + disabledBeschaedigt + ">BESCHÄDIGT</button>"
+                        + "<button onclick='erfassen(" + d.id + "," + inventurId + ",\"VERMISST\")' class='btn-vermisst' " + disabledVermisst + ">VERMISST</button>"
+                        + "</div></div>";
+                });
+
+                document.getElementById("statTotal").textContent = total;
+                document.getElementById("statErfasst").textContent = erfasst;
+                document.getElementById("statFortschritt").textContent = Math.round(erfasst / total * 100) + "%";
+            } else if (req.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+            } else {
+                alert("Fehler beim Laden der Exemplare");
+            }
+        }
+    };
+    req.open("GET", "inventurListe?inventurId=" + inventurId, true);
+    req.send();
+}
+
+function erfassen(exemplarId, inventurId, status) {
+    let scrollY = window.scrollY;
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                ladeExemplare(inventurId);
+                window.scrollTo(0, scrollY);
+            } else if (req.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+            } else {
+                alert("Fehler beim Erfassen");
+            }
+        }
+    };
+    req.open("POST", "inventurErfassen", true);
+    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.send("inventurExemplarId=" + exemplarId + "&status=" + status);
+}
+
+function beenden(inventurId) {
+    if (!confirm("Inventur abschließen?")) return;
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                alert("Inventur abgeschlossen!");
+                document.getElementById("bereichDetails").classList.add('hide');
+
+                ladeInventur('LAUFEND');
+
+                document.getElementById('bereichLaufend').classList.remove('hide');
+                document.getElementById('bereichAbgeschlossen').classList.add('hide');
+                document.getElementById('bereichStart').classList.add('hide');
+                document.getElementById('bereichDetails').classList.add('hide');
+                document.getElementById('hauptbuttons').classList.add('hide');
+
+                aktiverButton = 'laufend';
+                vorherigerBereich = null;
+            } else if (req.status == 401) {
+                alert(request.responseText);
+            } else {
+                alert("Fehler beim Abschließen der Inventur");
+            }
+        }
+    };
+    req.open("POST", "inventurAbschliessen", true);
+    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.send("inventurId=" + inventurId);
+}
+
+function loescheInventur(inventurId) {
+    if (!confirm("Diese Inventur wirklich löschen?")) return;
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                alert(req.responseText);
+                ladeInventur('ABGESCHLOSSEN');
+            } else if (req.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+            } else {
+                alert("Fehler: " + req.responseText);
+            }
+        }
+    };
+    req.open("POST", "inventurLoeschen", true);
+    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.send("inventurId=" + inventurId);
+}
+
+function loescheAlleInventuren() {
+    if (!confirm("ALLE abgeschlossenen Inventuren wirklich löschen?")) return;
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                alert(req.responseText);
+                ladeInventur('ABGESCHLOSSEN');
+            } else if (req.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+            } else {
+                alert("Fehler: " + req.responseText);
+            }
+        }
+    };
+    req.open("POST", "inventurLoeschen", true);
+    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.send("alle=true");
+}
+
+function loadStandorte() {
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                let data = JSON.parse(req.responseText);
+                let sel = document.getElementById("standortSelect");
+                sel.innerHTML = "<option value=''>Standort wählen</option>";
+                data.forEach(function(s) {
+                    sel.innerHTML += "<option value='" + s.id + "'>" + s.name + ", " + s.strasse + ", " + s.plz + " " + s.ort + "</option>";
+                });
+            } else if (req.status == 401) {
+                alert("Sie sind nicht eingeloggt.");
+            } else {
+                alert("Fehler beim Laden der Standorte");
+            }
+        }
+    };
+    req.open("GET", "standortliste", true);
+    req.send();
+}
+
+window.onload = loadStandorte;
+</script>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="sidebar">
+        <h2>Bibliothek</h2>
+        <a href="manager.html">Home</a>
+        <a href="standort.html">Standort Hinzufügen</a>
+        <a href="exemplarAnsehen.html">Alle Exemplare</a>
+        <a href="mitarbeiterliste.html">Mitarbeiter Liste</a>
+        <a href="addmitarbeiter.html">Mitarbeiter Hinzufügen</a>
+        <a href="mitgliedListe.html">Mitglieder Liste</a>
+        <a href="managerHistory.html">Mitglieder Historie</a>
+        <a id="yes" href="#">Inventur</a>
+        <a href="statistik.html">Statistik</a>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        <form action="logout" method="POST"><button type="submit">Logout</button></form>
+    </div>
+
+    <div class="content">
+        <div class="page-header"><h1>Inventur</h1></div>
+
+        <div class="inventur-container">
+
+            <div id="hauptbuttons" class="main-buttons">
+                <button onclick="toggle('start')">Inventur starten</button>
+                <button onclick="toggle('laufend')">Laufende</button>
+                <button onclick="toggle('abgeschlossen')">Abgeschlossene</button>
+            </div>
+
+            <div id="bereichStart" class="hide">
+                <div class="bereich-header">
+                    <h2>Inventur starten</h2>
+                    <button onclick="back()" class="btn-zurueck">Zurück</button>
+                </div>
+                <div class="select-container">
+                    <select id="standortSelect"><option value="">Standort wählen</option></select>
+                    <button onclick="starte()" class="btn-start">Starten</button>
+                </div>
+            </div>
+
+            <div id="bereichLaufend" class="hide">
+                <div class="bereich-header">
+                    <h2>Laufende Inventuren</h2>
+                    <button onclick="back()" class="btn-zurueck">Zurück</button>
+                </div>
+                <div class="such-zeile">
+                    <span>⌕</span>
+                    <input type="text" id="sucheLaufend" placeholder="Nach Standort suchen..." oninput="sucheInventur('LAUFEND')">
+                </div>
+                <div id="inventurListeLaufend"></div>
+            </div>
+
+            <div id="bereichAbgeschlossen" class="hide">
+                <div class="bereich-header">
+                    <h2>Abgeschlossene Inventuren</h2>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <button onclick="loescheAlleInventuren()" class="btn-alle-loeschen">Alle löschen</button>
+                        <button onclick="back()" class="btn-zurueck">Zurück</button>
+                    </div>
+                </div>
+                <div class="such-zeile">
+                    <input type="text" id="sucheAbgeschlossen" placeholder="Nach Standort suchen..." oninput="sucheInventur('ABGESCHLOSSEN')">
+                </div>
+                <div id="inventurListeAbgeschlossen"></div>
+            </div>
+
+            <div id="bereichDetails" class="hide">
+                <div class="bereich-header">
+                    <h2>Details</h2>
+                    <button onclick="backToList()" class="btn-zurueck">Zurück</button>
+                </div>
+                <div class="inventur-stats">
+                    <div class="stat-item"><span class="zahl" id="statTotal">0</span><span class="label">Total</span></div>
+                    <div class="stat-item"><span class="zahl" id="statErfasst">0</span><span class="label">Erfasst</span></div>
+                    <div class="stat-item"><span class="zahl" id="statFortschritt">0%</span><span class="label">Fortschritt</span></div>
+                </div>
+                <div class="exemplar-grid" id="exemplarContainer"></div>
+                <div class="details-footer">
+                    <button onclick="backToList()" class="btn-zurueck">Zurück zur Übersicht</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

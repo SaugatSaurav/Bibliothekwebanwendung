@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Statistik</title>
+
+<link rel="stylesheet" href="management.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
+
+<script>
+
+let statistik = null;
+
+let genreChart = null;
+let monatChart = null;
+let standortChart = null;
+let topChart = null;
+
+// Chart.js DataLabels Plugin registrieren
+Chart.register(ChartDataLabels);
+
+window.onload = function () {
+    ladeStatistik();
+};
+
+function ladeStatistik() {
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                statistik = JSON.parse(request.responseText);
+                zeichneGenre();
+                zeichneMonate();
+                zeichneStandorte();
+                zeichneTopBuecher();
+            } else if(request.status== 401){
+                  alert("Sie sind nicht eingeloggt");
+            } else {
+                console.error("Fehler beim Laden der Statistik:", request.status);
+            }
+
+        }
+    };
+
+    request.open("GET", "statistik", true);
+    request.send();
+}
+
+/* -------------------------
+   GENRE
+--------------------------*/
+function zeichneGenre() {
+    if (!statistik || !statistik.genre) return;
+
+    if (genreChart) {
+        genreChart.destroy();
+    }
+
+    let labels = [];
+    let daten = [];
+
+    for (let i = 0; i < statistik.genre.length; i++) {
+        labels.push(statistik.genre[i].genre);
+        daten.push(statistik.genre[i].anzahl);
+    }
+
+    genreChart = new Chart(
+        document.getElementById("genreChart"),
+        {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: daten
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "right",
+                        labels: {
+                            boxWidth: 15,
+                            boxHeight: 15,
+                            padding: 15
+                        }
+                    },
+                    datalabels: {
+                        color: "white",
+                        font: {
+                            weight: "bold",
+                            size: 14
+                        },
+                        formatter: function(value, context) {
+                            let sum = 0;
+                            let data = context.chart.data.datasets[0].data;
+                            for (let i = 0; i < data.length; i++) {
+                                sum += data[i];
+                            }
+                            let prozent = (value / sum * 100).toFixed(1);
+                            return prozent + "%";
+                        }
+                    }
+                }
+            }
+        }
+    );
+}
+
+/* -------------------------
+   MONATE
+--------------------------*/
+
+function zeichneMonate() {
+    if (!statistik || !statistik.monate) return;
+
+    if (monatChart) {
+        monatChart.destroy();
+    }
+
+    let labels = [];
+    let daten = [];
+
+    for (let i = 0; i < statistik.monate.length; i++) {
+        labels.push(statistik.monate[i].monat);
+        daten.push(statistik.monate[i].anzahl);
+    }
+
+    monatChart = new Chart(
+        document.getElementById("monatChart"),
+        {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: daten,
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Monat"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: "Anzahl Ausleihen"
+                        }
+                    }
+                }
+            }
+        }
+    );
+}
+
+/* -------------------------
+   STANDORTE
+--------------------------*/
+function zeichneStandorte() {
+    if (!statistik || !statistik.standorte) return;
+
+    if (standortChart) {
+        standortChart.destroy();
+    }
+
+    let labels = [];
+    let daten = [];
+
+    for (let i = 0; i < statistik.standorte.length; i++) {
+        labels.push(statistik.standorte[i].name);
+        daten.push(statistik.standorte[i].exemplare);
+    }
+
+    standortChart = new Chart(
+        document.getElementById("standortChart"),
+        {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: daten,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Standort"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: "Anzahl Exemplare"
+                        }
+                    }
+                }
+            }
+        }
+    );
+}
+
+/* -------------------------
+   TOP BÜCHER
+--------------------------*/
+function zeichneTopBuecher() {
+    if (!statistik || !statistik.top) return;
+
+    if (topChart) {
+        topChart.destroy();
+    }
+
+    let labels = [];
+    let daten = [];
+
+    for (let i = 0; i < statistik.top.length; i++) {
+        labels.push(statistik.top[i].titel);
+        daten.push(statistik.top[i].anzahl);
+    }
+
+    topChart = new Chart(
+        document.getElementById("topChart"),
+        {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: daten,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',  // Gleiche Farbe wie Standorte
+                    borderColor: 'rgba(54, 162, 235, 1)',        // Gleiche Farbe wie Standorte
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: "y",
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: "Anzahl Ausleihen"
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Buchtitel"
+                        }
+                    }
+                }
+            }
+        }
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <h2>Bibliothek</h2>
+
+      <a href="manager.html">Home</a>
+      <a href="standort.html">Standort Hinzufügen</a>
+      <a href="exemplarAnsehen.html">Alle Exemplare</a>
+      <a href="mitarbeiterliste.html">Mitarbeiter Liste</a>
+      <a href="addmitarbeiter.html">Mitarbeiter Hinzufügen</a>
+      <a href="mitgliedListe.html">Mitglieder Liste</a>
+      <a href="managerHistory.html">Mitglieder Historie</a>
+      <a href="inventur.html">Inventur</a>
+      <a id="yes" href="#">Statistik</a>
+
+        <form action="logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
+    <div class="content">
+
+        <div class="page-header">
+            <h1>Bibliotheksstatistik</h1>
+        </div>
+
+
+ <!--       <div class="chart-box">
+            <h2>Ausleihen pro Monat</h2>
+            <canvas id="monatChart"></canvas>
+        </div>
+ -->
+
+        <div class="chart-box pie-chart">
+            <h2>Genre-Verteilung</h2>
+            <canvas id="genreChart"></canvas>
+        </div>
+
+
+        <div class="chart-box">
+            <h2>Exemplar Anzal pro Standort</h2>
+            <canvas id="standortChart"></canvas>
+        </div>
+
+        <div class="chart-box">
+            <h2>Meist ausgeliehene Bücher</h2>
+            <canvas id="topChart"></canvas>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

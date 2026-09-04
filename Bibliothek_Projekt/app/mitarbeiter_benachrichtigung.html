@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bibliothekssystem</title>
+
+<link rel="stylesheet" href="management.css">
+
+
+
+<script>
+
+function ladeReservierungen() {
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+        if(request.readyState == 4) {
+            if(request.status == 200) {
+
+                let daten = JSON.parse(request.responseText);
+                let liste = document.getElementById("reservierungsliste");
+
+                liste.innerHTML = "";
+
+                if(daten.length == 0) {
+                    liste.innerHTML =  "<h3>Keine Benachrichtigungen vorhanden.</h3>";
+                    return;
+                }
+
+
+                let html = "";
+
+                let aktuelleMitgliedId = -1;
+
+                for(let i = 0; i < daten.length; i++) {
+                    
+                  if(aktuelleMitgliedId != daten[i].mitgliedId) {
+                        if(aktuelleMitgliedId != -1) {
+
+                            html += "</div>";
+                            html += "</div>";
+                        }
+
+                        aktuelleMitgliedId = daten[i].mitgliedId;
+
+                        html +=
+                            "<div class='reservierungsgruppe'>"
+                            + "<div class='reservierungsgruppen-kopf'>"
+                            + "<div>"
+
+                            + "<h2>Mitglied: " + daten[i].mitgliedName + "</h2>"
+
+                            + "<p>Mitglied-ID: "+ daten[i].mitgliedId+ "</p>"
+
+                            + "</div>"
+                            + "<button type='button' class='neues-buch-btn' onclick=\"alleAusleihen('"
+                            + daten[i].mitgliedId + "')\">" + "Alle ausleihen lassen" + "</button>"
+                            + "</div>"
+
+                            + "<div class='exemplar-liste'>";
+                    }
+
+
+                    /*
+                     * Jedes reservierte Exemplar
+                     * des Mitglieds anzeigen.
+                     */
+                    html +=
+
+                        "<div class='buchkarte'>"
+                        + "<div class='buchIcon'>📘</div>"
+                        + "<div class='buchInfo'>"
+                        +"<h3>Exemplar ID: "+ daten[i].exemplarId + "</h3>"
+                        + "<h3>Titel: " + daten[i].titel + "</h3>"
+
+                        + "<p>Autor: " + daten[i].autor
+                        + "</p>"
+
+                       
+                        + "<p>Barcode: "
+                        + daten[i].barcode
+                        + "</p>"
+
+                        + "<p>Standort: "
+                        + daten[i].standort
+                        + "</p>"
+
+                        + "<p>Regal: "
+                        + daten[i].regal
+                        + "</p>"
+
+                        + "<p>Status: "
+                        + "<span style='color:brown;font-weight:bold'>"
+                        + "Reserviert"
+                        + "</span>"
+                        + "</p>"
+
+                        + "</div>"
+
+                        + "</div>";
+                }
+
+
+                /*
+                 * Das letzte Mitglied-Div schließen.
+                 */
+                if(aktuelleMitgliedId != -1) {
+
+                    html += "</div>";
+                    html += "</div>";
+                }
+
+                liste.innerHTML = html;
+
+
+            } else if(request.status == 401) {
+
+                alert("Sie sind nicht eingeloggt.");
+
+            } else {
+
+                alert("Fehler beim Laden der Reservierungen.");
+            }
+        }
+    };
+
+    request.open("GET","mitarbeiterBenachrichtigung",true);
+    request.send();
+}
+
+
+
+function alleAusleihen(mitgliedId) {
+
+    let antwort = confirm(
+        "Alle Exemplare dieses Mitglieds ausleihen?");
+
+    if(antwort == false) {
+        return;
+    }
+
+    let request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+
+        if(request.readyState == 4) {
+
+            if(request.status == 200) {
+                alert("Alle Exemplare wurden ausgeliehen.");
+                ladeReservierungen();
+
+            } else if(request.status == 409) {
+                alert("Keine offenen Reservierungen gefunden.");
+                ladeReservierungen();
+
+            } else {
+                alert("Fehler beim Ausleihen.");
+            }
+        }
+    };
+
+    request.open("POST","mitarbeiterBenachrichtigung",true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("mitgliedid=" + mitgliedId);
+}
+
+
+
+window.onload = function() {
+
+    ladeReservierungen();
+};
+
+</script>
+
+
+</head>
+
+<body>
+  
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>Bibliothek</h2>
+
+        <a  href="mitarbeiter.html">Home</a>
+        <a id="yes" href="#">Benachrichtigung</a>
+        <a href="exemplarAnsehen_mitarbeiter.html">Alle Exemplare</a>
+        <a href="mitgliedListe_mitarbeiter.html">Mitglieder Liste</a>
+         <a href="mitarbeiterHistory.html">Mitglieder History</a>
+
+      <form action="logout" method="POST">
+         <button type="submit">Logout</button>
+      </form>
+
+    </div>
+
+    <div class="content">
+
+        <div class="page-header">
+        
+            <h1>Benachrichtigung</h1>
+        
+    
+      </div>
+
+
+
+      <div class="benachrichtigung-navigation">
+
+       <button type="button" id="yup" onclick="window.location.href='mitarbeiter_benachrichtigung.html'">
+           Ausleihen Benachrichtigung
+       </button>
+
+       <button type="button" onclick="window.location.href='mitarbeiter_rückgabe_benachrichtigung.html'">
+           Rückgabe Benachrichtigung
+       </button>
+
+     </div>
+     
+     <br>
+     <hr>
+     <br>
+      <div id="reservierungsliste">
+
+      </div>
+
+
+</div>    
+
+
+
+  
+</body>
+
+</html>
