@@ -99,7 +99,6 @@ Nach der Bestätigung einer Ausleihe durch einen Mitarbeiter erhält das Mitglie
 * PDF-Ausleihbeleg
 * QR-Code
 
-Der SMTP-Zugang wird nicht direkt im Quellcode gespeichert.
 
 # Verwendete Technologien
 
@@ -155,7 +154,7 @@ Die benötigten Java-Bibliotheken befinden sich im Projekt beziehungsweise müss
 Eine vereinfachte Struktur des Projekts:
 
 ```text
-NewFinalProject/
+Bibliothekswebanwendung/
 ├── app/
 │   ├── WEB-INF/
 │   │   ├── web.xml
@@ -187,8 +186,6 @@ NewFinalProject/
 
 # Lokale Konfiguration
 
-Sensible Zugangsdaten werden nicht direkt im Quellcode gespeichert.
-
 Die lokale Konfiguration kann beispielsweise folgende Werte enthalten:
 
 ```text
@@ -204,13 +201,6 @@ mailuser=...
 mailpassword=...
 ```
 
-Die Datei mit echten Zugangsdaten sollte nicht in GitHub gespeichert werden.
-
-Beispielsweise sollte sie über `.gitignore` ausgeschlossen werden:
-
-```text
-local/config.txt
-```
 
 # Sicherheit
 
@@ -221,16 +211,6 @@ Die Anwendung verwendet unter anderem:
 * PBKDF2WithHmacSHA512 zur Passwortverarbeitung
 * SecureRandom
 * PreparedStatements für Datenbankzugriffe
-
-Passwörter und andere sensible Zugangsdaten sollten niemals öffentlich in GitHub gespeichert werden.
-
-Dazu gehören insbesondere:
-
-* Datenbankpasswörter
-* Redis-Passwörter
-* Gmail-Passwörter
-* Google-App-Passwörter
-* persönliche Access Tokens
 
 # Build
 
@@ -248,21 +228,6 @@ Das Skript:
 4. erstellt eine WAR-Datei
 5. deployt die Anwendung über den Tomcat Manager
 
-# Git
-
-Repository klonen:
-
-```bash
-git clone <REPOSITORY-URL>
-```
-
-Anschließend in das Projekt wechseln:
-
-```bash
-cd NewFinalProject
-```
-
-Die lokale Konfigurationsdatei mit den eigenen Zugangsdaten muss nach dem Klonen separat erstellt werden.
 
 # Deployment
 
@@ -272,23 +237,6 @@ Das Deployment erfolgt über die vorhandenen Shell-Skripte und den Tomcat Manage
 
 Die produktive Umgebung verwendet zusätzlich Docker und HAProxy.
 
-# Datenbank
-
-Als relationale Datenbank wird MariaDB verwendet.
-
-Zu den zentralen Daten gehören unter anderem:
-
-* Mitglieder
-* Mitarbeiter
-* Manager
-* Bücher
-* Exemplare
-* Standorte
-* Reservierungen
-* Ausleihen
-* Rückgaben
-* Gebühren
-* Historieneinträge
 
 # PDF und QR-Code
 
@@ -298,10 +246,3 @@ Der Beleg enthält Informationen zum Mitglied sowie zu den ausgeliehenen Exempla
 
 Zusätzlich wird ein QR-Code erzeugt, der für die Anzeige beziehungsweise Verarbeitung der Ausleihinformationen verwendet werden kann.
 
-# Autor
-
-Entwickelt im Rahmen eines Software-Engineering-Projekts.
-
-## Hinweis
-
-Dieses Projekt wurde zu Lern- und Demonstrationszwecken entwickelt.
